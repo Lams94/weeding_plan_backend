@@ -28,6 +28,24 @@ io.on('connection', (socket) => {
 app.use(cors());
 app.use(express.json());
 
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', service: 'wedding-plan-backend' });
+});
+
+app.get('/api/health', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ status: 'ok', database: 'connected' });
+  } catch (error) {
+    console.error('Database health check failed:', error);
+    res.status(500).json({
+      status: 'error',
+      database: 'unreachable',
+      message: error.message
+    });
+  }
+});
+
 // --- CONFIGURATION UPLOAD APK (MULTER) ---
 const downloadDir = path.join(__dirname, 'public', 'downloads');
 if (!fs.existsSync(downloadDir)) {
@@ -61,15 +79,20 @@ app.post('/api/upload-apk', upload.single('apkFile'), (req, res) => {
 
 // --- WEDDINGS (SAAS PROJECTS) ---
 app.get('/api/weddings', async (req, res) => {
-  const weddings = await prisma.wedding.findMany({ 
-    orderBy: { createdAt: 'desc' },
-    include: {
-      agenda: { orderBy: { time: 'asc' } },
-      vendors: true,
-      guests: true
-    }
-  });
-  res.json(weddings);
+  try {
+    const weddings = await prisma.wedding.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        agenda: { orderBy: { time: 'asc' } },
+        vendors: true,
+        guests: true
+      }
+    });
+    res.json(weddings);
+  } catch (error) {
+    console.error('Error fetching weddings:', error);
+    res.status(500).json({ error: 'Failed to fetch weddings', message: error.message });
+  }
 });
 
 app.post('/api/weddings', async (req, res) => {
