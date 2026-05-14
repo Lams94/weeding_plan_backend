@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mode Cortège - Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Newsreader:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#e1c299",
+                        "primary-fixed": "#feddb3",
+                        "primary-container": "#d2b48c",
+                        "inverse-surface": "#2f312f",
+                        "on-background": "#1a1c1a",
+                        "surface": "#faf9f6",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c7c6c4",
+                        "on-secondary-fixed": "#1d1c15",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e9e8e5",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e3e2e0",
+                        "background": "#faf9f6",
+                        "on-primary-fixed": "#281801",
+                        "tertiary": "#5e5e5d",
+                        "on-tertiary-container": "#494948",
+                        "surface-container-highest": "#e3e2e0",
+                        "secondary-container": "#e4dfd5",
+                        "primary-fixed-dim": "#e1c299",
+                        "surface-tint": "#725a39",
+                        "on-secondary-fixed-variant": "#49473f",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#725a39",
+                        "surface-dim": "#dbdad7",
+                        "on-surface-variant": "#4d453c",
+                        "on-secondary": "#ffffff",
+                        "outline": "#7f766a",
+                        "on-surface": "#1a1c1a",
+                        "secondary-fixed": "#e7e2d8",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#efeeeb",
+                        "inverse-on-surface": "#f2f1ee",
+                        "on-primary-container": "#5b4526",
+                        "outline-variant": "#d1c5b8",
+                        "secondary-fixed-dim": "#cac6bc",
+                        "on-tertiary-fixed-variant": "#464746",
+                        "surface-container-low": "#f4f3f1",
+                        "tertiary-fixed": "#e3e2e0",
+                        "on-tertiary-fixed": "#1b1c1b",
+                        "on-primary-fixed-variant": "#584324",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#b9b9b7",
+                        "on-secondary-container": "#65635a",
+                        "secondary": "#615e56",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#faf9f6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "unit": "8px",
+                        "section-padding": "80px",
+                        "gutter": "24px",
+                        "container-max": "1140px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Newsreader"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Newsreader"],
+                        "label-sm": ["Inter"],
+                        "headline-xl": ["Newsreader"],
+                        "headline-lg": ["Newsreader"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen flex overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar Component -->
+<nav class="bg-surface-bright dark:bg-inverse-surface fixed left-0 h-full w-80 border-r-[0.5px] border-outline-variant shadow-none flex flex-col py-12 px-8 z-50">
+<div class="mb-16">
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Prestige Admin</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2 uppercase tracking-widest">Managing the Grand Gala</p>
+</div>
+<ul class="flex-1 space-y-2">
+<!-- Guest Hub -->
+<li>
+<a class="flex items-center gap-4 py-3 px-4 font-body-md text-body-md uppercase tracking-widest text-on-surface-variant hover:bg-surface-container-low hover:pl-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Guest Hub</span>
+</a>
+</li>
+<!-- Circles CRM -->
+<li>
+<a class="flex items-center gap-4 py-3 px-4 font-body-md text-body-md uppercase tracking-widest text-on-surface-variant hover:bg-surface-container-low hover:pl-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span>Circles CRM</span>
+</a>
+</li>
+<!-- Vendors -->
+<li>
+<a class="flex items-center gap-4 py-3 px-4 font-body-md text-body-md uppercase tracking-widest text-on-surface-variant hover:bg-surface-container-low hover:pl-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">storefront</span>
+<span>Vendors</span>
+</a>
+</li>
+<!-- Backstage (ACTIVE) -->
+<li>
+<a class="flex items-center gap-4 py-3 px-4 font-body-md text-body-md uppercase tracking-widest text-primary bg-surface-container-high dark:bg-secondary-container rounded-none border-r-2 border-primary transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined fill">chat_bubble</span>
+<span>Backstage</span>
+</a>
+</li>
+<!-- Settings -->
+<li>
+<a class="flex items-center gap-4 py-3 px-4 font-body-md text-body-md uppercase tracking-widest text-on-surface-variant hover:bg-surface-container-low hover:pl-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</li>
+</ul>
+<div class="mt-auto">
+<button class="w-full py-4 bg-primary text-on-primary font-label-sm text-label-sm uppercase tracking-widest hover:bg-surface-tint transition-colors duration-300 flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                NEW EVENT
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-80 h-full overflow-y-auto bg-background">
+<div class="max-w-container-max mx-auto px-12 py-16">
+<!-- Page Header -->
+<header class="mb-16">
+<div class="flex items-end justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-4 block">Live Operations</span>
+<h2 class="font-headline-xl text-headline-xl text-on-background">Mode Cortège</h2>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-3 border border-outline-variant text-primary font-label-sm text-label-sm uppercase tracking-widest hover:bg-surface-container transition-colors duration-300 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">map</span>
+                            View Map
+                        </button>
+</div>
+</div>
+</header>
+<!-- Summary Bento Grid -->
+<section class="grid grid-cols-3 gap-6 mb-16">
+<!-- Total Convoy -->
+<div class="bg-surface-container-lowest p-8 border-[0.5px] border-outline-variant/30 flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Total Convoy</span>
+<div class="mt-6 flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-on-background">08</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Vehicles</span>
+</div>
+</div>
+<!-- Active Status -->
+<div class="bg-surface-container-low p-8 border-[0.5px] border-outline-variant/30 flex flex-col justify-between">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">En Route</span>
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+</div>
+<div class="mt-6 flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-primary">07</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Active</span>
+</div>
+</div>
+<!-- Alerts -->
+<div class="bg-error-container/20 p-8 border-[0.5px] border-error-container flex flex-col justify-between">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-on-error-container uppercase tracking-widest">Alerts</span>
+<span class="material-symbols-outlined text-error">warning</span>
+</div>
+<div class="mt-6">
+<span class="font-headline-md text-headline-md text-error block mb-1">Vehicle 04 Delayed</span>
+<span class="font-body-md text-body-md text-on-surface-variant opacity-80">Traffic incident ahead</span>
+</div>
+</div>
+</section>
+<!-- Fleet Grid -->
+<section>
+<div class="flex justify-between items-center mb-8 border-b border-outline-variant/50 pb-4">
+<h3 class="font-headline-md text-headline-md text-on-background">Fleet Telemetry</h3>
+<div class="flex gap-6 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
+<span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Lead</span>
+<span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Support</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+<!-- Vehicle Card: Lead -->
+<article class="bg-surface p-8 border-[0.5px] border-outline-variant/30 relative overflow-hidden group">
+<!-- Decorative subtle gradient for lead -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-container/10 blur-2xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+<div class="flex justify-between items-start mb-8">
+<div>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-2 block flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">stars</span> Lead Car
+                                </span>
+<h4 class="font-headline-lg text-headline-lg text-on-background">Maybach S680</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Driver: A. Laurent</p>
+</div>
+<div class="px-3 py-1 bg-surface-container-high text-on-surface text-[11px] font-medium tracking-widest uppercase">
+                                On Route
+                            </div>
+</div>
+<div class="grid grid-cols-3 gap-4 pt-6 border-t border-outline-variant/20">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block mb-1 opacity-70">Speed</span>
+<span class="font-body-lg text-body-lg text-on-background">45 km/h</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block mb-1 opacity-70">Fuel/Bat</span>
+<span class="font-body-lg text-body-lg text-on-background">88%</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block mb-1 opacity-70">Dist. from Lead</span>
+<span class="font-body-lg text-body-lg text-on-background">--</span>
+</div>
+</div>
+</article>
+<!-- Vehicle Card: Standard -->
+<article class="bg-surface-container-lowest p-8 border-[0.5px] border-outline-variant/30">
+<div class="flex justify-between items-start mb-8">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2 block">Vehicle 02</span>
+<h4 class="font-headline-md text-headline-md text-on-background">S-Class W223</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Driver: M. Dubois</p>
+</div>
+<div class="px-3 py-1 bg-surface-container-high text-on-surface text-[11px] font-medium tracking-widest uppercase">
+                                On Route
+                            </div>
+</div>
+<div class="grid grid-cols-3 gap-4 pt-6 border-t border-outline-variant/20">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block mb-1 opacity-70">Speed</span>
+<span class="font-body-lg text-body-lg text-on-background">44 km/h</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block mb-1 opacity-70">Fuel/Bat</span>
+<span class="font-body-lg text-body-lg text-on-background">92%</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block mb-1 opacity-70">Dist. from Lead</span>
+<span class="font-body-lg text-body-lg text-on-background">15 m</span>
+</div>
+</div>
+</article>
+<!-- Vehicle Card: Standard -->
+<article class="bg-surface-container-lowest p-8 border-[0.5px] border-outline-variant/30">
+<div class="flex justify-between items-start mb-8">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2 block">Vehicle 03</span>
+<h4 class="font-headline-md text-headline-md text-on-background">V-Class VIP</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Driver: S. Martin</p>
+</div>
+<div class="px-3 py-1 bg-surface-container-high text-on-surface text-[11px] font-medium tracking-widest uppercase">
+                                On Route
+                            </div>
+</div>
+<div class="grid grid-cols-3 gap-4 pt-6 border-t border-outline-variant/20">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block mb-1 opacity-70">Speed</span>
+<span class="font-body-lg text-body-lg text-on-background">44 km/h</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block mb-1 opacity-70">Fuel/Bat</span>
+<span class="font-body-lg text-body-lg text-on-background">75%</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block mb-1 opacity-70">Dist. from Lead</span>
+<span class="font-body-lg text-body-lg text-on-background">32 m</span>
+</div>
+</div>
+</article>
+<!-- Vehicle Card: Alert -->
+<article class="bg-error-container/5 p-8 border-[0.5px] border-error/20">
+<div class="flex justify-between items-start mb-8">
+<div>
+<span class="font-label-sm text-label-sm text-error uppercase tracking-widest mb-2 block flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">warning</span> Vehicle 04
+                                </span>
+<h4 class="font-headline-md text-headline-md text-on-background">Range Rover SV</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Driver: J. Moreau</p>
+</div>
+<div class="px-3 py-1 bg-error/10 text-error text-[11px] font-medium tracking-widest uppercase border border-error/20">
+                                Delayed
+                            </div>
+</div>
+<div class="grid grid-cols-3 gap-4 pt-6 border-t border-error/10">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block mb-1 opacity-70">Speed</span>
+<span class="font-body-lg text-body-lg text-on-background">0 km/h</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block mb-1 opacity-70">Fuel/Bat</span>
+<span class="font-body-lg text-body-lg text-on-background">60%</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-error uppercase tracking-widest block mb-1 opacity-70">Dist. from Lead</span>
+<span class="font-body-lg text-body-lg text-error">450 m</span>
+</div>
+</div>
+</article>
+</div>
+</section>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* DEFAULT: Linen Pure */
+    --color-surface-tint: #775a19;
+    --color-tertiary-container: #b3a386;
+    --color-on-secondary: #ffffff;
+    --color-primary-container: #c5a059;
+    --color-error: #ba1a1a;
+    --color-surface: #fcf9f8;
+    --color-surface-container-highest: #e5e2e1;
+    --color-on-primary-container: #4e3700;
+    --color-on-surface-variant: #4e4639;
+    --color-secondary-fixed: #e3e2e0;
+    --color-inverse-primary: #e9c176;
+    --color-tertiary-fixed-dim: #d6c4a5;
+    --color-secondary-container: #e0e0dd;
+    --color-surface-container-low: #f6f3f2;
+    --color-secondary: #5e5f5d;
+    --color-tertiary: #6a5d43;
+    --color-inverse-surface: #313030;
+    --color-on-secondary-fixed: #1a1c1a;
+    --color-on-primary-fixed-variant: #5d4201;
+    --color-primary-fixed-dim: #e9c176;
+    --color-outline: #7f7667;
+    --color-on-secondary-fixed-variant: #464745;
+    --color-primary-fixed: #ffdea5;
+    --color-surface-variant: #e5e2e1;
+    --color-surface-container-lowest: #ffffff;
+    --color-on-secondary-container: #626361;
+    --color-on-background: #1c1b1b;
+    --color-on-error-container: #93000a;
+    --color-secondary-fixed-dim: #c7c6c4;
+    --color-on-tertiary: #ffffff;
+    --color-primary: #775a19;
+    --color-on-tertiary-fixed-variant: #51452d;
+    --color-surface-container-high: #eae7e7;
+    --color-surface-dim: #dcd9d9;
+    --color-on-tertiary-fixed: #231a06;
+    --color-tertiary-fixed: #f3e0c0;
+    --color-on-error: #ffffff;
+    --color-on-tertiary-container: #453922;
+    --color-background: #fcf9f8;
+    --color-error-container: #ffdad6;
+    --color-on-primary: #ffffff;
+    --color-surface-container: #f0eded;
+    --color-on-surface: #1c1b1b;
+    --color-outline-variant: #d1c5b4;
+    --color-surface-bright: #fcf9f8;
+    --color-inverse-on-surface: #f3f0ef;
+    --color-on-primary-fixed: #261900;
+    
+    /* Variables communes de noise */
+    --bg-noise: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.04"/></svg>');
+  }
+
+  /* THEME 1: SYKY (Futuriste / Tech / Dark) */
+  .theme-syky {
+    --color-background: #09090b;
+    --color-surface: #121214;
+    --color-surface-container: #18181b;
+    --color-surface-container-high: #27272a;
+    --color-surface-container-low: #0f0f11;
+    --color-surface-variant: #27272a;
+    --color-on-background: #fafafa;
+    --color-on-surface: #fafafa;
+    --color-on-surface-variant: #a1a1aa;
+    
+    --color-primary: #a855f7; /* Purple Neon */
+    --color-primary-container: #3b0764;
+    --color-on-primary: #ffffff;
+    --color-on-primary-container: #e9d5ff;
+    
+    --color-secondary: #06b6d4; /* Cyan Neon */
+    --color-secondary-container: #164e63;
+    --color-on-secondary: #ffffff;
+    --color-on-secondary-container: #cffafe;
+    
+    --color-tertiary: #f43f5e; /* Pink Neon */
+    --color-tertiary-container: #881337;
+    --color-on-tertiary: #ffffff;
+    --color-on-tertiary-container: #ffe4e6;
+    
+    --color-outline: #3f3f46;
+    --color-outline-variant: #27272a;
+    
+    --bg-noise: none; /* Pas de grain pour le style futuriste glassmorphism */
+  }
+
+  /* THEME 2: EDITORIALIST (Luxe / Sérif) */
+  .theme-editorialist {
+    --color-background: #fdfbf7;
+    --color-surface: #ffffff;
+    --color-surface-container: #f5f3ef;
+    --color-surface-container-high: #ebe9e4;
+    --color-surface-container-low: #faf8f5;
+    --color-surface-variant: #ebe9e4;
+    --color-on-background: #111111;
+    --color-on-surface: #111111;
+    --color-on-surface-variant: #555555;
+    
+    --color-primary: #000000; /* Black for high contrast luxury */
+    --color-primary-container: #e0e0e0;
+    --color-on-primary: #ffffff;
+    --color-on-primary-container: #000000;
+    
+    --color-secondary: #d4af37; /* Gold accent */
+    --color-secondary-container: #fbf5e6;
+    --color-on-secondary: #ffffff;
+    --color-on-secondary-container: #5c4a11;
+    
+    --color-outline: #dcdad5;
+    --color-outline-variant: #efede8;
+  }
+
+  /* THEME 3: BOHO CANVAS */
+  .theme-boho-canvas {
+    --color-background: #fcf8f2;
+    --color-surface: #fdfaf6;
+    --color-surface-container: #f5eedf;
+    --color-on-background: #4a4036;
+    --color-on-surface: #4a4036;
+    
+    --color-primary: #d68c70; /* Terracotta */
+    --color-primary-container: #fbdacb;
+    --color-on-primary: #ffffff;
+    --color-on-primary-container: #4f291c;
+    
+    --color-secondary: #8da399; /* Sage green */
+    --color-secondary-container: #d2e3db;
+    --color-on-secondary: #ffffff;
+    --color-on-secondary-container: #263830;
+  }
+
+  /* THEME 4: VELVET NIGHT */
+  .theme-velvet-night {
+    --color-background: #0f1423; /* Deep navy */
+    --color-surface: #151b2e;
+    --color-surface-container: #1b233a;
+    --color-on-background: #e6e8f0;
+    --color-on-surface: #e6e8f0;
+    --color-on-surface-variant: #a4abc0;
+    
+    --color-primary: #b8905b; /* Champagne gold */
+    --color-primary-container: #4a3821;
+    --color-on-primary: #ffffff;
+    --color-on-primary-container: #f2dec4;
+    
+    --color-secondary: #6e1f32; /* Deep burgundy */
+    --color-secondary-container: #3d0d19;
+    --color-on-secondary: #ffffff;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+    background-image: var(--bg-noise);
+    min-height: max(884px, 100dvh);
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+}
+
+@keyframes loading-slide {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

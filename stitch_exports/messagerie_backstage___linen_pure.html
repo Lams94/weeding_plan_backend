@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Communications Hub - Prestige Edition</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Newsreader:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e3e2e0",
+                        "inverse-on-surface": "#f2f1ee",
+                        "surface-container": "#efeeeb",
+                        "surface": "#faf9f6",
+                        "tertiary-fixed": "#e3e2e0",
+                        "on-error-container": "#93000a",
+                        "primary": "#725a39",
+                        "surface-tint": "#725a39",
+                        "on-tertiary-container": "#494948",
+                        "secondary-fixed-dim": "#cac6bc",
+                        "on-background": "#1a1c1a",
+                        "surface-bright": "#faf9f6",
+                        "surface-container-low": "#f4f3f1",
+                        "primary-container": "#d2b48c",
+                        "primary-fixed": "#feddb3",
+                        "surface-container-high": "#e9e8e5",
+                        "on-secondary-fixed-variant": "#49473f",
+                        "on-primary-fixed": "#281801",
+                        "secondary": "#615e56",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#dbdad7",
+                        "on-surface": "#1a1c1a",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2f312f",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "outline": "#7f766a",
+                        "on-tertiary-fixed-variant": "#464746",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#e1c299",
+                        "tertiary-container": "#b9b9b7",
+                        "surface-variant": "#e3e2e0",
+                        "secondary-container": "#e4dfd5",
+                        "on-primary-fixed-variant": "#584324",
+                        "on-secondary-fixed": "#1d1c15",
+                        "on-surface-variant": "#4d453c",
+                        "on-tertiary-fixed": "#1b1c1b",
+                        "background": "#faf9f6",
+                        "primary-fixed-dim": "#e1c299",
+                        "on-secondary-container": "#65635a",
+                        "outline-variant": "#d1c5b8",
+                        "tertiary-fixed-dim": "#c7c6c4",
+                        "on-primary-container": "#5b4526",
+                        "tertiary": "#5e5e5d",
+                        "secondary-fixed": "#e7e2d8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "section-padding": "80px",
+                        "margin-mobile": "16px",
+                        "unit": "8px",
+                        "container-max": "1140px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Newsreader"],
+                        "headline-lg": ["Newsreader"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Newsreader"],
+                        "label-sm": ["Inter"],
+                        "headline-xl": ["Newsreader"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #faf9f6;
+            background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23cac6bc" fill-opacity="0.1" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="1"/%3E%3Ccircle cx="13" cy="13" r="1"/%3E%3C/g%3E%3C/svg%3E');
+        }
+        /* Custom scrollbar for minimalism */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e3e2e0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d1c5b8; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<div class="flex h-screen w-full">
+<!-- SideNavBar Component -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface bg-surface-container-low duration-300 ease-in-out py-unit px-4 z-40 border-r border-outline-variant/20">
+<div class="mb-12 mt-6 px-4">
+<h1 class="font-headline-md text-headline-md text-primary mb-1">Prestige Edition</h1>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">Wedding Cockpit</p>
+</div>
+<div class="flex-1 space-y-2">
+<a class="flex items-center space-x-4 px-4 py-3 rounded-lg text-secondary opacity-70 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">groups</span>
+<span class="font-body-md text-body-md tracking-wide">Guest Hub</span>
+</a>
+<a class="flex items-center space-x-4 px-4 py-3 rounded-lg text-secondary opacity-70 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">hub</span>
+<span class="font-body-md text-body-md tracking-wide">Circles CRM</span>
+</a>
+<a class="flex items-center space-x-4 px-4 py-3 rounded-lg text-secondary opacity-70 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">storefront</span>
+<span class="font-body-md text-body-md tracking-wide">Vendors</span>
+</a>
+<a class="flex items-center space-x-4 px-4 py-3 rounded-lg text-primary font-bold border-r-2 border-primary bg-surface-container hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">theater_comedy</span>
+<span class="font-body-md text-body-md tracking-wide">Backstage</span>
+</a>
+<a class="flex items-center space-x-4 px-4 py-3 rounded-lg text-secondary opacity-70 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-body-md text-body-md tracking-wide">Settings</span>
+</a>
+</div>
+<div class="mt-auto pt-6 border-t border-outline-variant/20 mb-6">
+<div class="flex items-center px-4 space-x-3">
+<img alt="Planner Profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant/30" data-alt="A softly lit, natural portrait of a female wedding planner in a minimalist atelier setting. She wears a tailored linen blazer in a warm beige tone. The lighting is diffused, bright, and organic, reflecting a high-end, calm professional demeanor. The background is slightly out of focus, showing glimpses of neutral tones and organic materials like dried florals." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJtd0z88Z_MegDQIbmiugTHKxYrWpNfjpFjXFyWn_VTCDkPVHYGXi7uxr18I5ifQyva5Myjtbgs-0HT8vWpj0tWxPJB4hdHJd9mgAJaL6rJMGZwUKArHXdbOY29LrT2fTL8SHEj5afvVu_Yj6-I9igPq41pnAGdwFixoimEzdrv7BhyX2Pi1mBK0PyBk6goi15Pz0Zfod77yDjSUaIU4gmttbV63LI7uZHJe5imeaV33nArVBD-zxhnx_MIpACzvnUYG0u7bHASU2d"/>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">E. Thompson</p>
+<p class="font-label-sm text-label-sm text-secondary opacity-70">Lead Planner</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- TopAppBar (Mobile Only) -->
+<header class="md:hidden flex justify-between items-center w-full px-section-padding py-gutter max-w-container-max mx-auto docked full-width top-0 bg-surface/80 backdrop-blur-xl transition-all duration-200 z-40 fixed">
+<h1 class="font-headline-md text-headline-md text-primary">Cockpit - Prestige Edition</h1>
+<div class="flex items-center space-x-4">
+<button class="text-secondary hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<img alt="Planner Avatar" class="w-8 h-8 rounded-full" data-alt="A softly lit, natural portrait of a female wedding planner in a minimalist atelier setting. She wears a tailored linen blazer in a warm beige tone. The lighting is diffused, bright, and organic, reflecting a high-end, calm professional demeanor. The background is slightly out of focus, showing glimpses of neutral tones and organic materials like dried florals." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtjSYLhgLxasMhnqddwK5QQYCh-nVkjePJsAJFq-a0paXcSwW5z6gCdIS4nS_2sZFnhUa1eBZM_LSywYuLRY00zrOq60ftUCBrH7kiksOlsz7gVd2BHvRXW5FG17pIqabPs75XKowBAdBn_Qjd18KCDAeLsmIJFi9tgkGTJGPUpfSSFEHQQzBO946nN7M78M7hBcVc_pKAx_E6FmG8eFHp_MEx-CYA2paBsFM8lcPmHYU6lRCheOpiJ83kHGp9EJPPeXKLTJxq2FwX"/>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-64 flex flex-col md:flex-row h-screen pt-[72px] md:pt-0">
+<!-- Conversations List (Left Panel) -->
+<aside class="w-full md:w-96 flex flex-col border-r border-outline-variant/20 bg-surface-container-lowest flex-shrink-0">
+<div class="p-6 pb-2 border-b border-outline-variant/10">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">Messages</h2>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-tertiary text-[20px]">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2.5 pl-10 pr-4 font-body-md text-body-md text-on-surface placeholder:text-secondary focus:ring-1 focus:ring-primary focus:bg-surface-container transition-colors" placeholder="Search conversations..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-2">
+<!-- Active Chat -->
+<div class="bg-surface-container px-4 py-4 rounded-xl cursor-pointer transition-colors relative">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full"></div>
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">The Beaulieu Wedding</h3>
+<span class="font-label-sm text-label-sm text-secondary">10:42 AM</span>
+</div>
+<p class="font-body-md text-body-md text-secondary truncate">Sarah: The floral arrangements arrived, they look perfect.</p>
+<div class="mt-3 flex gap-2">
+<span class="px-2 py-1 bg-surface-container-high rounded-md font-label-sm text-label-sm text-on-surface-variant">Logistics</span>
+<span class="px-2 py-1 bg-surface-container-high rounded-md font-label-sm text-label-sm text-on-surface-variant">Florals</span>
+</div>
+</div>
+<!-- Inactive Chat 1 -->
+<div class="px-4 py-4 rounded-xl cursor-pointer hover:bg-surface-container-low transition-colors">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-body-md text-on-surface">Gala de Charité</h3>
+<span class="font-label-sm text-label-sm text-secondary">Yesterday</span>
+</div>
+<p class="font-body-md text-body-md text-secondary truncate">Pierre: Finalizing the seating chart now.</p>
+</div>
+<!-- Inactive Chat 2 -->
+<div class="px-4 py-4 rounded-xl cursor-pointer hover:bg-surface-container-low transition-colors">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-body-md text-on-surface">Anniversaire - M. Dupont</h3>
+<span class="font-label-sm text-label-sm text-secondary">Tue</span>
+</div>
+<p class="font-body-md text-body-md text-secondary truncate">Caterer requires confirmation on the vegan options.</p>
+</div>
+</div>
+</aside>
+<!-- Active Chat Window (Right Panel) -->
+<section class="flex-1 flex flex-col bg-surface relative hidden md:flex">
+<!-- Chat Header -->
+<div class="h-20 px-8 flex items-center justify-between border-b border-outline-variant/10 bg-surface-container-lowest/80 backdrop-blur-md z-10 sticky top-0">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">The Beaulieu Wedding</h2>
+<p class="font-label-sm text-label-sm text-secondary mt-1 tracking-widest uppercase">Internal Logistics Channel</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-secondary hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">call</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-secondary hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Chat Messages Area -->
+<div class="flex-1 overflow-y-auto p-8 space-y-8">
+<!-- Date Separator -->
+<div class="flex justify-center">
+<span class="px-4 py-1 bg-surface-container rounded-full font-label-sm text-label-sm text-secondary">Today</span>
+</div>
+<!-- Received Message -->
+<div class="flex gap-4 max-w-2xl">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0 text-on-surface-variant font-label-sm text-label-sm">S</div>
+<div class="space-y-2">
+<div class="flex items-baseline gap-2">
+<span class="font-body-md text-body-md font-medium text-on-surface">Sarah (Florist)</span>
+<span class="font-label-sm text-label-sm text-tertiary">10:35 AM</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-2xl rounded-tl-none border border-outline-variant/10 shadow-sm">
+<p class="font-body-md text-body-md text-on-surface">The first batch of centerpieces just arrived at the venue. Setting them up in the main hall now.</p>
+</div>
+</div>
+</div>
+<!-- Received Message with Image -->
+<div class="flex gap-4 max-w-2xl">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0 text-on-surface-variant font-label-sm text-label-sm">S</div>
+<div class="space-y-2">
+<div class="flex items-baseline gap-2">
+<span class="font-body-md text-body-md font-medium text-on-surface">Sarah (Florist)</span>
+<span class="font-label-sm text-label-sm text-tertiary">10:42 AM</span>
+</div>
+<div class="bg-surface-container-lowest p-2 rounded-2xl rounded-tl-none border border-outline-variant/10 shadow-sm">
+<img alt="Wedding Floral Arrangement" class="rounded-xl w-full max-w-sm object-cover" data-alt="A close-up, high-quality photograph of an elegant, organic floral centerpiece resting on a raw linen tablecloth. The arrangement features muted, soft colors—pale peach peonies, ivory roses, and delicate dried grasses. The lighting is soft and diffused, resembling natural morning light pouring through a large window, creating a serene, high-end, and romantic mood consistent with organic minimalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnBlBVCXpmTu3RHrw3JyE9A-SKXM0LTe-UNOC8PrY_0_LsgYhwrrRNIjkQrPiCRUbYwzEcpgcwWcb9vowe_JxIn8J78b4o95dsBzH2VAB6itvrB6kP0TXHI3j26XTG_qlbSmPCPWD9QeQXz9RZdct_E_mmAG77YDKqE0CM0VEXLha8JL-VdIqS8m-dHjQMKzURPFzZTn4of1kOUj7oYyYHuPHQ2yeP9Swh_fnuJxmcZXY4VRMccdg9Elfme19evS7IJ4AvAP5Omq5Z"/>
+<p class="font-body-md text-body-md text-on-surface mt-3 px-2 pb-2">The floral arrangements arrived, they look perfect. Lighting adjustments might be needed to highlight the pale tones.</p>
+</div>
+</div>
+</div>
+<!-- Sent Message -->
+<div class="flex gap-4 max-w-2xl ml-auto flex-row-reverse">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0 text-on-primary-container font-label-sm text-label-sm">E</div>
+<div class="space-y-2 flex flex-col items-end">
+<div class="flex items-baseline gap-2 flex-row-reverse">
+<span class="font-body-md text-body-md font-medium text-on-surface">You</span>
+<span class="font-label-sm text-label-sm text-tertiary">10:45 AM</span>
+</div>
+<div class="bg-primary p-4 rounded-2xl rounded-tr-none text-on-primary">
+<p class="font-body-md text-body-md">Stunning. I will notify the lighting team to soften the spots over tables 1-5.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Message Input Area -->
+<div class="p-6 bg-surface-container-lowest/80 backdrop-blur-md border-t border-outline-variant/10">
+<div class="max-w-4xl mx-auto flex items-end gap-4">
+<button class="w-12 h-12 rounded-full flex items-center justify-center text-secondary hover:bg-surface-container transition-colors flex-shrink-0">
+<span class="material-symbols-outlined">add</span>
+</button>
+<div class="flex-1 bg-surface-container rounded-2xl p-2 flex items-end">
+<textarea class="w-full bg-transparent border-none resize-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder:text-secondary py-2 px-3 max-h-32" placeholder="Type a message..." rows="1" style="min-height: 44px;"></textarea>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-primary hover:bg-surface-container-highest transition-colors flex-shrink-0 mb-0.5">
+<span class="material-symbols-outlined">mood</span>
+</button>
+</div>
+<button class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary hover:opacity-90 transition-opacity flex-shrink-0 shadow-sm">
+<span class="material-symbols-outlined ml-1">send</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] rounded-full bg-surface/90 backdrop-blur-2xl bg-surface-container-low border border-outline-variant/10 shadow-xl z-50 flex justify-around items-center px-6 py-3 max-w-md mx-auto">
+<a class="flex flex-col items-center justify-center text-secondary opacity-60 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Agenda</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-bold scale-110 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">theater_comedy</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Backstage</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary opacity-60 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined">layers</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Floorplan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary opacity-60 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Guests</span>
+</a>
+</nav>
+</div>
+</body></html>

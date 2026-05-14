@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cockpit - Prestige Edition | Spatial Mapping</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Newsreader:wght@300;400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e3e2e0",
+                        "inverse-on-surface": "#f2f1ee",
+                        "surface-container": "#efeeeb",
+                        "surface": "#faf9f6",
+                        "tertiary-fixed": "#e3e2e0",
+                        "on-error-container": "#93000a",
+                        "primary": "#725a39",
+                        "surface-tint": "#725a39",
+                        "on-tertiary-container": "#494948",
+                        "secondary-fixed-dim": "#cac6bc",
+                        "on-background": "#1a1c1a",
+                        "surface-bright": "#faf9f6",
+                        "surface-container-low": "#f4f3f1",
+                        "primary-container": "#d2b48c",
+                        "primary-fixed": "#feddb3",
+                        "surface-container-high": "#e9e8e5",
+                        "on-secondary-fixed-variant": "#49473f",
+                        "on-primary-fixed": "#281801",
+                        "secondary": "#615e56",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#dbdad7",
+                        "on-surface": "#1a1c1a",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2f312f",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "outline": "#7f766a",
+                        "on-tertiary-fixed-variant": "#464746",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#e1c299",
+                        "tertiary-container": "#b9b9b7",
+                        "surface-variant": "#e3e2e0",
+                        "secondary-container": "#e4dfd5",
+                        "on-primary-fixed-variant": "#584324",
+                        "on-secondary-fixed": "#1d1c15",
+                        "on-surface-variant": "#4d453c",
+                        "on-tertiary-fixed": "#1b1c1b",
+                        "background": "#faf9f6",
+                        "primary-fixed-dim": "#e1c299",
+                        "on-secondary-container": "#65635a",
+                        "outline-variant": "#d1c5b8",
+                        "tertiary-fixed-dim": "#c7c6c4",
+                        "on-primary-container": "#5b4526",
+                        "tertiary": "#5e5e5d",
+                        "secondary-fixed": "#e7e2d8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "section-padding": "80px",
+                        "margin-mobile": "16px",
+                        "unit": "8px",
+                        "container-max": "1140px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Newsreader"],
+                        "headline-lg": ["Newsreader"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Newsreader"],
+                        "label-sm": ["Inter"],
+                        "headline-xl": ["Newsreader"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+<!-- Desktop SideNavBar -->
+<aside class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface bg-surface-container-low duration-300 ease-in-out py-unit px-4 z-40 border-r border-outline-variant/10">
+<div class="py-6 px-2 mb-8">
+<h2 class="font-headline-md text-headline-md text-primary mb-1">Prestige Edition</h2>
+<p class="font-body-md text-body-md text-secondary opacity-70">Wedding Cockpit</p>
+</div>
+<nav class="flex flex-col gap-2 flex-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary opacity-70 hover:bg-surface-container-high transition-colors font-body-md text-body-md tracking-wide" href="#">
+<span class="material-symbols-outlined">groups</span>
+                Guest Hub
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary opacity-70 hover:bg-surface-container-high transition-colors font-body-md text-body-md tracking-wide" href="#">
+<span class="material-symbols-outlined">hub</span>
+                Circles CRM
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary opacity-70 hover:bg-surface-container-high transition-colors font-body-md text-body-md tracking-wide" href="#">
+<span class="material-symbols-outlined">storefront</span>
+                Vendors
+            </a>
+<!-- Active State: Backstage -> Closest match for event execution/mapping -->
+<a class="flex items-center gap-3 px-4 py-3 bg-surface-container text-primary font-bold border-r-2 border-primary duration-300 ease-in-out font-body-md text-body-md tracking-wide" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">theater_comedy</span>
+                Backstage
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary opacity-70 hover:bg-surface-container-high transition-colors font-body-md text-body-md tracking-wide mt-auto" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</nav>
+</aside>
+<!-- Main Wrapper -->
+<div class="flex-1 flex flex-col md:ml-64 w-full min-h-screen">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 bg-surface/80 backdrop-blur-xl bg-transparent transition-all duration-200 z-30 sticky">
+<div class="flex justify-between items-center w-full px-section-padding py-gutter max-w-container-max mx-auto md:px-section-padding px-margin-mobile">
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Cockpit - Prestige Edition</h1>
+<div class="flex items-center gap-6">
+<button class="text-primary hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+</button>
+<button class="text-primary hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-container-max mx-auto px-margin-mobile md:px-section-padding py-gutter md:py-section-padding pb-32 md:pb-section-padding">
+<!-- Page Header -->
+<div class="mb-section-padding flex flex-col gap-4">
+<h2 class="font-headline-xl text-headline-xl text-on-background">Spatial Mapping</h2>
+<p class="font-body-lg text-body-lg text-secondary max-w-2xl">Manage event flow and live positioning. Adjust the floorplan in real-time to accommodate late arrivals and dynamic program shifts.</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Floorplan Canvas (Span 8) -->
+<div class="lg:col-span-8 flex flex-col gap-unit">
+<div class="bg-surface-container-lowest rounded-xl p-6 md:p-8 flex-1 flex flex-col min-h-[600px] border border-outline-variant/20 relative overflow-hidden group">
+<div class="flex justify-between items-center mb-6 z-10 relative">
+<h3 class="font-headline-md text-headline-md text-on-surface">Main Hall</h3>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+                                Edit Layout
+                            </button>
+</div>
+<!-- The Blueprint Area -->
+<div class="flex-1 w-full rounded-lg bg-surface-container-low overflow-hidden relative border border-outline-variant/30 flex items-center justify-center bg-cover bg-center" data-alt="A highly stylized, top-down architectural floorplan diagram of an elegant event space, rendered in organic minimalist style. The blueprint uses soft linen tones, warm greys, and crisp thin linework to delineate circular dining tables, a designated square dance floor area, and a specialized DJ booth setup. The lighting mimics soft, natural daylight illuminating high-quality, tactile tracing paper, conveying a serene, high-end professional aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA4nX6YZGlnf2tiKcWSVmP6fnrFRfAzV_a_E3bSyWCEssHnttH67-QNNbha6GZt1YaC0KM5SrmaP6AZ_TK3GlgyqrPwSXtaDHMH2Vko9Wilsv1HEYKwC9xmBAdtZEOl47hBeb6pA6IM_bIcAuDdhbpysy-srXVYtEmC-WutJNJsZE02yUwESnXrJLSJWG5qBysxmkNn7bit4BJSsbA8duht0D37crUtD7IjQM7rIg0X2MBr0UNLF0TwtaAIoNsf8WwroO7Yfce5p9Uu');">
+<!-- Interactive overlay elements to simulate the floorplan UI -->
+<div class="absolute inset-0 bg-surface/40 backdrop-blur-[2px]"></div>
+<!-- Sample Markers -->
+<div class="absolute top-[20%] left-[30%] flex flex-col items-center gap-1">
+<div class="w-12 h-12 rounded-full border border-primary bg-surface/80 backdrop-blur-md flex items-center justify-center text-primary font-label-sm text-label-sm">T12</div>
+</div>
+<div class="absolute top-[25%] left-[60%] flex flex-col items-center gap-1">
+<div class="w-12 h-12 rounded-full border border-primary bg-surface/80 backdrop-blur-md flex items-center justify-center text-primary font-label-sm text-label-sm">T14</div>
+</div>
+<div class="absolute bottom-[30%] left-[45%] w-32 h-32 border border-outline bg-surface-container-lowest/50 backdrop-blur-sm flex items-center justify-center">
+<span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">Dance Floor</span>
+</div>
+<div class="absolute bottom-[15%] left-[45%] w-32 h-12 border border-outline bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center">
+<span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">DJ Booth</span>
+</div>
+</div>
+<!-- Legend -->
+<div class="mt-6 flex flex-wrap gap-4 z-10 relative">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full border border-primary"></div>
+<span class="font-label-sm text-label-sm text-secondary">Available Table</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary border border-primary"></div>
+<span class="font-label-sm text-label-sm text-secondary">Occupied Table</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 border border-outline"></div>
+<span class="font-label-sm text-label-sm text-secondary">Functional Zone</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Side Widgets (Span 4) -->
+<div class="lg:col-span-4 flex flex-col gap-gutter">
+<!-- Live Deck Widget -->
+<div class="bg-surface-container rounded-xl p-8 border border-outline-variant/10">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface">Live Deck</h3>
+<div class="w-2 h-2 rounded-full bg-error animate-pulse"></div>
+</div>
+<div class="flex items-center gap-6 mb-8">
+<div class="w-16 h-16 rounded-lg bg-surface flex items-center justify-center border border-outline-variant/20 shadow-sm relative overflow-hidden">
+<img alt="Vinyl record texture" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-multiply" data-alt="A close-up abstract view of a sleek, dark vinyl record with subtle grooves reflecting warm ambient light. The aesthetic is clean, minimalist, and tactile, evoking a sense of refined analog audio in a sophisticated modern setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSA7ZKGxLggSOLRJhRVHPL67aVe1hYUO-9IYEIST6o3rnr4QPFFEch2RmIr3sjAgpjrRw40ktvkYrTtLu5wcMgUdLKn6EbAtBR3WO_HHruv322HYH6LHRp9j7cbwjlMFdLSipyhEx-Jvoc91joxSffW62zqXI_nhND1wWqmx-hVsgaPL0XIOdDakqFLerKSc9HftQkpVApqSI9qRoOicAGqgDRdnJkx-GS379uiD5rxrC6F51f2E7vxPPf-0BzmFFLmCl7cVI_mMkE"/>
+<span class="material-symbols-outlined text-primary z-10">album</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-1">Now Playing</p>
+<p class="font-body-lg text-body-lg text-on-surface">Claire de Lune (Acoustic)</p>
+<p class="font-body-md text-body-md text-secondary">String Quartet</p>
+</div>
+</div>
+<div class="flex justify-between items-center px-4 py-3 bg-surface-container-high rounded-lg">
+<button class="text-secondary hover:text-primary transition-colors"><span class="material-symbols-outlined">skip_previous</span></button>
+<button class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-colors"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">pause</span></button>
+<button class="text-secondary hover:text-primary transition-colors"><span class="material-symbols-outlined">skip_next</span></button>
+</div>
+</div>
+<!-- Retardataires List -->
+<div class="bg-surface-container-lowest rounded-xl p-8 border border-outline-variant/20 flex-1">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline-md text-headline-md text-on-surface">Retardataires</h3>
+<span class="px-3 py-1 bg-error-container text-on-error-container font-label-sm text-label-sm rounded-full">3 Pending</span>
+</div>
+<ul class="flex flex-col gap-6">
+<li class="flex items-start justify-between pb-4 border-b border-outline-variant/20">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-body-md">EM</div>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Elara Mercer</p>
+<p class="font-body-md text-body-md text-secondary text-sm">Table 12 • +15 mins</p>
+</div>
+</div>
+<button class="p-2 text-secondary hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</li>
+<li class="flex items-start justify-between pb-4 border-b border-outline-variant/20">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-body-md">JT</div>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Julian Thorne</p>
+<p class="font-body-md text-body-md text-secondary text-sm">Table 04 • +25 mins</p>
+</div>
+</div>
+<button class="p-2 text-secondary hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</li>
+<li class="flex items-start justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-body-md">SV</div>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Silvia Vance</p>
+<p class="font-body-md text-body-md text-secondary text-sm">Table 04 • ETA Unknown</p>
+</div>
+</div>
+<button class="p-2 text-secondary hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile BottomNavBar -->
+<nav class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] rounded-full bg-surface/90 backdrop-blur-2xl border border-outline-variant/10 shadow-xl z-50 flex justify-around items-center px-6 py-3 max-w-md mx-auto">
+<a class="flex flex-col items-center justify-center text-secondary opacity-60 hover:scale-105 transition-transform font-label-sm text-label-sm-mobile gap-1" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+            Agenda
+        </a>
+<a class="flex flex-col items-center justify-center text-secondary opacity-60 hover:scale-105 transition-transform font-label-sm text-label-sm-mobile gap-1" href="#">
+<span class="material-symbols-outlined">theater_comedy</span>
+            Backstage
+        </a>
+<!-- Active State: Floorplan -->
+<a class="flex flex-col items-center justify-center text-primary font-bold scale-110 duration-150 font-label-sm text-label-sm-mobile gap-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">layers</span>
+            Floorplan
+        </a>
+<a class="flex flex-col items-center justify-center text-secondary opacity-60 hover:scale-105 transition-transform font-label-sm text-label-sm-mobile gap-1" href="#">
+<span class="material-symbols-outlined">group</span>
+            Guests
+        </a>
+</nav>
+</body></html>

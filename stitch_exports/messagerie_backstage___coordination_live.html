@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cockpit - Prestige Edition | Backstage</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#fcf9f8",
+                        "on-tertiary-fixed-variant": "#51452d",
+                        "secondary-fixed-dim": "#c7c6c4",
+                        "tertiary": "#6a5d43",
+                        "secondary-fixed": "#e3e2e0",
+                        "on-tertiary-fixed": "#231a06",
+                        "tertiary-container": "#b3a386",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "outline": "#7f7667",
+                        "on-secondary-fixed": "#1a1c1a",
+                        "on-secondary-container": "#626361",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#313030",
+                        "secondary-container": "#e0e0dd",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#775a19",
+                        "surface": "#fcf9f8",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#dcd9d9",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "background": "#fcf9f8",
+                        "surface-container-highest": "#e5e2e1",
+                        "surface-container": "#f0eded",
+                        "on-surface-variant": "#4e4639",
+                        "primary-fixed-dim": "#e9c176",
+                        "surface-variant": "#e5e2e1",
+                        "primary-fixed": "#ffdea5",
+                        "primary-container": "#c5a059",
+                        "secondary": "#5e5f5d",
+                        "outline-variant": "#d1c5b4",
+                        "on-secondary-fixed-variant": "#464745",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#d6c4a5",
+                        "surface-container-low": "#f6f3f2",
+                        "on-background": "#1c1b1b",
+                        "on-surface": "#1c1b1b",
+                        "on-primary-container": "#4e3700",
+                        "surface-container-high": "#eae7e7",
+                        "on-primary-fixed": "#261900",
+                        "on-primary-fixed-variant": "#5d4201",
+                        "tertiary-fixed": "#f3e0c0",
+                        "primary": "#775a19",
+                        "on-tertiary-container": "#453922",
+                        "inverse-primary": "#e9c176"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "32px",
+                        "section-gap": "128px",
+                        "container-padding-desktop": "80px",
+                        "container-padding-mobile": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Bodoni Moda"],
+                        "display-lg": ["Bodoni Moda"],
+                        "headline-lg": ["Bodoni Moda"],
+                        "headline-md": ["Bodoni Moda"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "label-sm": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["42px", { "lineHeight": "1.2", "fontWeight": "300" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "300" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Hanken Grotesk', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .display, .headline { font-family: 'Bodoni Moda', serif; }
+        .glass-panel {
+            background: rgba(252, 249, 248, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        /* Hide scrollbar for clean aesthetic */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1c5b4;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col md:flex-row antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar (Mobile Only) -->
+<header class="md:hidden flex justify-between items-center px-container-padding-mobile py-6 w-full max-w-full bg-surface border-b-[0.5px] border-outline-variant z-50 sticky top-0">
+<div class="font-display-lg text-headline-md uppercase tracking-tighter text-primary">Cockpit - Prestige Edition</div>
+<button class="text-primary hover:text-primary transition-colors duration-300">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+</button>
+</header>
+<!-- SideNavBar (Web Only) -->
+<nav class="hidden md:flex flex-col h-full py-12 px-8 fixed left-0 w-80 bg-surface-bright border-r-[0.5px] border-outline-variant z-40">
+<div class="mb-16">
+<h1 class="font-display-lg text-headline-md text-primary mb-2">Prestige Admin</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Managing the Grand Gala</p>
+</div>
+<div class="flex-grow flex flex-col gap-2">
+<a class="group flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low hover:pl-6 transition-all duration-300 ease-in-out font-label-sm text-label-sm uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
+                Guest Hub
+            </a>
+<a class="group flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low hover:pl-6 transition-all duration-300 ease-in-out font-label-sm text-label-sm uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">hub</span>
+                Circles CRM
+            </a>
+<a class="group flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low hover:pl-6 transition-all duration-300 ease-in-out font-label-sm text-label-sm uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">storefront</span>
+                Vendors
+            </a>
+<a class="group flex items-center gap-4 px-4 py-3 text-primary bg-surface-container-high rounded-none border-r-2 border-primary transition-all duration-300 ease-in-out font-label-sm text-label-sm uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+                Backstage
+            </a>
+<a class="group flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low hover:pl-6 transition-all duration-300 ease-in-out font-label-sm text-label-sm uppercase tracking-widest mt-auto" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+                Settings
+            </a>
+</div>
+<div class="mt-8">
+<button class="w-full py-3 px-6 border border-primary text-primary font-label-sm text-label-sm uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-colors duration-300">
+                NEW EVENT
+            </button>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-grow flex flex-col md:ml-80 w-full md:w-[calc(100%-20rem)] bg-background">
+<!-- Header Section -->
+<div class="pt-container-padding-mobile md:pt-16 pb-8 px-container-padding-mobile md:px-gutter max-w-7xl mx-auto w-full">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+<div class="w-full md:w-2/3">
+<h2 class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-4">Communications Hub</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">The central nervous system of your event planning. Manage distinct conversational channels with grace and precision.</p>
+</div>
+</div>
+<!-- Tab Navigation (Tripartite) -->
+<div class="flex gap-8 border-b-[0.5px] border-outline-variant w-full overflow-x-auto pb-4">
+<button class="font-label-sm text-label-sm uppercase tracking-widest text-primary border-b-2 border-primary pb-1 flex-shrink-0">
+                    Mariés ↔ Planner
+                </button>
+<button class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors pb-1 flex-shrink-0">
+                    Planner ↔ Presta
+                </button>
+<button class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors pb-1 flex-shrink-0">
+                    Inter-Presta
+                </button>
+</div>
+</div>
+<!-- Chat Interface Area -->
+<div class="flex-grow flex flex-col md:flex-row px-container-padding-mobile md:px-gutter pb-16 max-w-7xl mx-auto w-full gap-gutter h-[calc(100vh-250px)]">
+<!-- Thread List (Left Column) -->
+<div class="w-full md:w-1/3 flex flex-col border-[0.5px] border-outline-variant bg-surface-container-lowest h-full">
+<div class="p-4 border-b-[0.5px] border-outline-variant bg-surface-bright">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-transparent border-b-[0.5px] border-outline-variant pl-10 pr-4 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary placeholder-on-surface-variant/50" placeholder="Search conversations..." type="text"/>
+</div>
+</div>
+<div class="flex-grow overflow-y-auto">
+<!-- Active Thread -->
+<div class="p-6 border-b-[0.5px] border-outline-variant bg-surface-container-low cursor-pointer border-l-2 border-l-primary">
+<div class="flex justify-between items-baseline mb-2">
+<h4 class="font-headline-md text-headline-md text-on-surface">The Beaulieu Wedding</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-[10px]">10:42 AM</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Isabella (Bride): We reviewed the floral moodboard, absolutely stunning. Can we discuss...</p>
+<div class="mt-3 flex gap-2">
+<span class="px-2 py-1 bg-primary-container/20 text-on-primary-container font-label-sm text-[10px] tracking-widest">URGENT</span>
+</div>
+</div>
+<!-- Inactive Thread -->
+<div class="p-6 border-b-[0.5px] border-outline-variant hover:bg-surface-container-lowest cursor-pointer transition-colors group">
+<div class="flex justify-between items-baseline mb-2">
+<h4 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Gala de Charité - M. Dupont</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-[10px]">Yesterday</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Planner: I've updated the timeline for the evening. Please confirm receipt.</p>
+</div>
+<!-- Inactive Thread -->
+<div class="p-6 border-b-[0.5px] border-outline-variant hover:bg-surface-container-lowest cursor-pointer transition-colors group">
+<div class="flex justify-between items-baseline mb-2">
+<h4 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Anniversaire - Domaine de Chantilly</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-[10px]">Mon</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Client: The menu selection looks perfect. Let's proceed with the tasting.</p>
+</div>
+</div>
+</div>
+<!-- Active Chat Area (Right Column) -->
+<div class="w-full md:w-2/3 flex flex-col border-[0.5px] border-outline-variant bg-surface-bright h-full relative">
+<!-- Chat Header -->
+<div class="px-8 py-6 border-b-[0.5px] border-outline-variant flex justify-between items-center bg-surface-container-lowest glass-panel z-10 sticky top-0">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">The Beaulieu Wedding</h3>
+<p class="font-body-md text-sm text-on-surface-variant">Mariés ↔ Planner Channel • 3 Participants</p>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 300;">more_vert</span>
+</button>
+</div>
+<!-- Messages -->
+<div class="flex-grow p-8 overflow-y-auto flex flex-col gap-8 bg-[#fcf9f8]">
+<!-- Date Divider -->
+<div class="flex justify-center my-4">
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface px-4 py-1 border-[0.5px] border-outline-variant tracking-widest text-[10px]">TODAY</span>
+</div>
+<!-- Message Received (Client) -->
+<div class="flex flex-col items-start w-3/4 max-w-2xl">
+<span class="font-label-sm text-[10px] text-on-surface-variant mb-2 tracking-widest uppercase">Isabella Beaulieu • 10:42 AM</span>
+<div class="p-6 bg-surface-container-low border-[0.5px] border-outline-variant">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                                Good morning! We reviewed the floral moodboard you sent over last night. It is absolutely stunning. Can we discuss the possibility of integrating more white peonies for the centerpiece, or are they out of season for our date?
+                            </p>
+<div class="mt-4 flex gap-4">
+<img alt="A high-fashion, editorial-style close-up photograph of a lush floral arrangement featuring white peonies and dark green foliage, set against a pristine, bright minimalist background. The lighting is soft and diffused, creating a refined, luxurious, and elegant light-mode aesthetic perfect for premium wedding planning UI." class="w-24 h-24 object-cover border-[0.5px] border-outline-variant filter grayscale hover:grayscale-0 transition-all duration-500 cursor-pointer" data-alt="A high-fashion, editorial-style close-up photograph of a lush floral arrangement featuring white peonies and dark green foliage, set against a pristine, bright minimalist background. The lighting is soft and diffused, creating a refined, luxurious, and elegant light-mode aesthetic perfect for premium wedding planning UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnKhjXdnHs333KahkEx4zwRxQNIlAHbL0vIU31zFd8qZRm8lEqygAhOmMI9QeXfST6aAg7dVXFD8I4LRzlkb5KbkzTRms3oUcObpiq7ybzqqEIZqxpfOtcAk7-3G1pWT9EQ4DMyT0Nj9EZcMdH_UqKmSWrYELQVZU0PerjxUwBPS80boIr67rK4aNC6SY9AHzRLLcyiM3oVpMJuMye10tp1WyAaCwBx0rm6bXjuEx2k-8ueiIlVrs7NtyZaW5-yrJnQbyeFlpRdYe4"/>
+</div>
+</div>
+</div>
+<!-- Message Sent (Planner) -->
+<div class="flex flex-col items-end w-3/4 max-w-2xl self-end">
+<span class="font-label-sm text-[10px] text-on-surface-variant mb-2 tracking-widest uppercase text-right">You (Planner) • 11:05 AM</span>
+<div class="p-6 bg-primary-container/10 border-[0.5px] border-primary-container text-right">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                                I am delighted you love the direction! White peonies will be perfectly in season. I will have the floral designer adjust the centerpieces proposal to heavily feature them and resend the sketches by this evening.
+                            </p>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="p-6 border-t-[0.5px] border-outline-variant bg-surface-container-lowest">
+<div class="flex items-end gap-4">
+<div class="flex-grow relative">
+<textarea class="w-full bg-surface resize-none border-[0.5px] border-outline-variant p-4 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-0 placeholder-on-surface-variant/50" placeholder="Compose your message..." rows="2"></textarea>
+<div class="absolute bottom-4 left-4 flex gap-3 text-on-surface-variant">
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 300;">attach_file</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 300;">image</span></button>
+</div>
+</div>
+<button class="bg-primary text-on-primary px-8 py-4 font-label-sm text-label-sm uppercase tracking-widest hover:bg-surface-tint transition-colors duration-300 h-[74px] flex items-center justify-center">
+                            SEND
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full glass-panel border-t-[0.5px] border-outline-variant z-50 flex justify-around items-center py-4 px-2">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-label-sm text-[10px] uppercase tracking-widest">Guests</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="font-label-sm text-[10px] uppercase tracking-widest border-b border-primary">Backstage</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">storefront</span>
+<span class="font-label-sm text-[10px] uppercase tracking-widest">Vendors</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-label-sm text-[10px] uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+</body></html>

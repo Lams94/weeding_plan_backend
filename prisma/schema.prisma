@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Wedding {
+  id                 String          @id @default(uuid())
+  name               String
+  date               DateTime?
+  theme              String          @default("theme-linen-pure")
+  ownerRole          String          @default("wedding_planner")
+  brideName          String?
+  groomName          String?
+  plannerName        String?
+  beneficiaries      String?
+  baseBudget         Float           @default(0)
+  onboardingComplete Boolean         @default(false)
+  guests             Guest[]
+  tables             Table[]
+  agenda             AgendaItem[]
+  messages           Message[]
+  vendors            Vendor[]
+  tracks             Track[]
+  vendorPayments     VendorPayment[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @default(now()) @updatedAt
+}
+
+model Guest {
+  id        String   @id @default(uuid())
+  name      String
+  circle    String   @default("Friends")
+  status    String   @default("Pending")
+  agendaVis Boolean  @default(false)
+  diet      Boolean  @default(false)
+  groupName String?
+  email     String?
+  tableId   String?
+  table     Table?   @relation(fields: [tableId], references: [id])
+  weddingId String?
+  wedding   Wedding? @relation(fields: [weddingId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Table {
+  id        String   @id @default(uuid())
+  name      String
+  topPos    String   @default("top-20")
+  leftPos   String   @default("left-20")
+  sizeClass String   @default("w-32 h-32")
+  chairs    Int      @default(4)
+  guests    Guest[]
+  weddingId String?
+  wedding   Wedding? @relation(fields: [weddingId], references: [id])
+}
+
+model AgendaItem {
+  id           String   @id @default(uuid())
+  time         String
+  title        String
+  description  String
+  isRestricted Boolean  @default(false)
+  isDone       Boolean  @default(false)
+  image        String?
+  orderIndex   Int      @default(0)
+  weddingId    String?
+  wedding      Wedding? @relation(fields: [weddingId], references: [id])
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  sender      String
+  time        String
+  text        String
+  isImportant Boolean  @default(false)
+  senderColor String   @default("primary")
+  weddingId   String?
+  wedding     Wedding? @relation(fields: [weddingId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Vendor {
+  id         String          @id @default(uuid())
+  role       String
+  name       String
+  status     String          @default("Pending")
+  budget     Float           @default(0)
+  paid       Float           @default(0)
+  phone      String?
+  isCritical Boolean         @default(false)
+  weddingId  String?
+  wedding    Wedding?        @relation(fields: [weddingId], references: [id])
+  payments   VendorPayment[]
+}
+
+model Track {
+  id          String   @id @default(uuid())
+  title       String
+  artist      String
+  orderIndex  Int      @default(0)
+  directives  String?
+  status      String   @default("queued") // queued, playing, played
+  weddingId   String?
+  wedding     Wedding? @relation(fields: [weddingId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model VendorPayment {
+  id          String   @id @default(uuid())
+  label       String
+  amount      Float
+  kind        String   @default("acompte")
+  status      String   @default("paid")
+  paidAt      DateTime @default(now())
+  dueDate     DateTime?
+  vendorId    String
+  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  weddingId   String
+  wedding     Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}

@@ -1,0 +1,39 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+android/app/build/
+android/build/
+android/.gradle/
+ios/App/build/
+
+# Local caches and tools
+.gradle-cache/
+.jdks/
+.vite/
+.cache/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Generated Prisma client
+src/generated/prisma/
+
+# APK artifacts
+*.apk

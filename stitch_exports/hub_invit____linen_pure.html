@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hub Invité - Le Programme</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Newsreader:opsz,wght@6..72,300;6..72,400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e3e2e0",
+                    "inverse-on-surface": "#f2f1ee",
+                    "surface-container": "#efeeeb",
+                    "surface": "#faf9f6",
+                    "tertiary-fixed": "#e3e2e0",
+                    "on-error-container": "#93000a",
+                    "primary": "#725a39",
+                    "surface-tint": "#725a39",
+                    "on-tertiary-container": "#494948",
+                    "secondary-fixed-dim": "#cac6bc",
+                    "on-background": "#1a1c1a",
+                    "surface-bright": "#faf9f6",
+                    "surface-container-low": "#f4f3f1",
+                    "primary-container": "#d2b48c",
+                    "primary-fixed": "#feddb3",
+                    "surface-container-high": "#e9e8e5",
+                    "on-secondary-fixed-variant": "#49473f",
+                    "on-primary-fixed": "#281801",
+                    "secondary": "#615e56",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#dbdad7",
+                    "on-surface": "#1a1c1a",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#2f312f",
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "outline": "#7f766a",
+                    "on-tertiary-fixed-variant": "#464746",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#e1c299",
+                    "tertiary-container": "#b9b9b7",
+                    "surface-variant": "#e3e2e0",
+                    "secondary-container": "#e4dfd5",
+                    "on-primary-fixed-variant": "#584324",
+                    "on-secondary-fixed": "#1d1c15",
+                    "on-surface-variant": "#4d453c",
+                    "on-tertiary-fixed": "#1b1c1b",
+                    "background": "#faf9f6",
+                    "primary-fixed-dim": "#e1c299",
+                    "on-secondary-container": "#65635a",
+                    "outline-variant": "#d1c5b8",
+                    "tertiary-fixed-dim": "#c7c6c4",
+                    "on-primary-container": "#5b4526",
+                    "tertiary": "#5e5e5d",
+                    "secondary-fixed": "#e7e2d8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "section-padding": "80px",
+                    "margin-mobile": "16px",
+                    "unit": "8px",
+                    "container-max": "1140px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": [
+                            "Newsreader"
+                    ],
+                    "headline-lg": [
+                            "Newsreader"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Newsreader"
+                    ],
+                    "label-sm": [
+                            "Inter"
+                    ],
+                    "headline-xl": [
+                            "Newsreader"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-xl": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "300"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        /* Smooth scrolling and minimalist scrollbar */
+        html { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1c5b8; border-radius: 4px; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md text-body-md antialiased min-h-screen selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl docked full-width top-0 bg-transparent flat no shadows transition-all duration-200 sticky z-40">
+<div class="flex justify-between items-center w-full px-section-padding py-gutter max-w-container-max mx-auto md:px-section-padding px-margin-mobile">
+<div class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">
+                Cockpit - Prestige Edition
+            </div>
+<div class="flex items-center gap-4 hidden">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity cursor-pointer">notifications</span>
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity cursor-pointer">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Main PWA Canvas -->
+<main class="max-w-md mx-auto px-margin-mobile pt-8 pb-40 flex flex-col gap-10">
+<!-- Hero Section -->
+<section class="text-center">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Le Programme du Week-end</h1>
+<p class="font-body-md text-body-md text-secondary">Une célébration de l'amour et de l'amitié</p>
+</section>
+<!-- Timeline Bento Card -->
+<section class="bg-surface-container-low rounded-[1.5rem] p-8 flex flex-col gap-8 relative overflow-hidden">
+<!-- Subtle background texture hint (simulated via radial gradient) -->
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-surface-container-high/50 to-transparent pointer-events-none"></div>
+<div class="relative z-10 flex gap-6">
+<div class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="w-px h-full bg-outline-variant/30 my-2"></div>
+</div>
+<div class="pt-2 pb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Cérémonie Civile</h3>
+<p class="font-body-md text-body-md text-secondary">14h30 - Mairie du Domaine</p>
+</div>
+</div>
+<div class="relative z-10 flex gap-6">
+<div class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">wine_bar</span>
+</div>
+<div class="w-px h-full bg-outline-variant/30 my-2"></div>
+</div>
+<div class="pt-2 pb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Cocktail</h3>
+<p class="font-body-md text-body-md text-secondary">17h00 - Jardins de l'Orangerie</p>
+</div>
+</div>
+<div class="relative z-10 flex gap-6">
+<div class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+</div>
+<div class="pt-2">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Dîner</h3>
+<p class="font-body-md text-body-md text-secondary">20h00 - Salle des Cristaux</p>
+</div>
+</div>
+</section>
+<!-- Menu & Map Grid (Asymmetric) -->
+<div class="grid grid-cols-1 gap-6">
+<!-- La Carte -->
+<section class="bg-surface-container rounded-[1.5rem] p-8 flex flex-col justify-between min-h-[200px] group cursor-pointer hover:bg-surface-container-high transition-colors duration-300">
+<div>
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-headline-md text-headline-md text-on-surface">La Carte</h2>
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">arrow_outward</span>
+</div>
+<p class="font-body-md text-body-md text-secondary mb-6">Découvrez le menu gastronomique de notre chef.</p>
+</div>
+<div class="w-full h-32 rounded-lg bg-surface-variant overflow-hidden">
+<img alt="Menu preview" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="A top-down, minimalist close-up of an elegant dining table setting. A pristine, off-white linen napkin is beautifully folded beside high-end matte silverware and a delicate, sparkling crystal wine glass. The scene is bathed in soft, diffused natural daylight that casts gentle, organic shadows across the textured table surface. The overarching aesthetic is serene, premium, and zen, utilizing a restrained palette of creams, warm grays, and subtle earthy taupes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRT7Nk2ud16uE9ahSS6S38pOSxCpd4d7Lldoj7qbYiKkQOLBdLI9q6aAjHS-F2DylGBJXPdOv9pIs5BX9AvexuARvfqe9ZnlesaYliKk4RtQtL9cCAcEHckmjyb7zUogQk4r7DQDZOjyvRgCJDwAJ7LY6qGUvbPaDDkI9F2eu7Qd4OweWdT43gVdRTkFmkZ89xTtpmSnWP4hzsOhSPRe9IoM_8U1d0rdclWCFDNb0WkKNGYVO54Lvq0GgCQm6ASGI9T2wSAscNzwzW"/>
+</div>
+</section>
+<!-- Cortège / Map -->
+<section class="bg-surface-container-lowest rounded-[1.5rem] border border-outline-variant/20 overflow-hidden group cursor-pointer">
+<div class="h-40 bg-surface-variant w-full relative">
+<img alt="Location Map" class="w-full h-full object-cover opacity-60" data-alt="An abstract, stylized aerial view resembling a minimalist cartographic map. Soft, flowing lines and muted, earthy tones suggest winding roads and organic landscapes. The image feels serene and textured, akin to a high-quality linen print or a watercolor painting in light beige and subtle olive hues. It evokes a sense of journey and calm destination, perfectly matching a premium, light-mode organic aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDT2ciRY8pSjQJNN2h303TmQNLrutFMfQ7szwFcCsYqjNl0nj_GRTiAEaNA0ZwDANX3D5gKCzZXDAxQSnYfgR1tYV0Fx4blmdKSG5GGjoEB8XoN5kzJh95MiP9UNSCcEh3w0w2GBmfDU2XuAcPBnBWg0BxT8hA3LtKln0wV46ETnn2RCYamKEJOQKo0GNUFfV-XGJ8jD2pa4aiOxpmuzD_R937KIDRSFIqexwNK7QDhzC3boEF2QOrNyfjHTHbhiqaHPqAJEOxFzEfj"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-surface/90 backdrop-blur-sm p-3 rounded-full shadow-sm text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-center justify-between mb-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">Cortège</h2>
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">directions_car</span>
+</div>
+<p class="font-body-md text-body-md text-secondary">Itinéraires et stationnement pour rejoindre le domaine.</p>
+</div>
+</section>
+</div>
+<!-- Action Button -->
+<section class="pt-4">
+<button class="w-full bg-primary-container text-on-primary-container font-body-lg text-body-lg py-5 rounded-full flex items-center justify-center gap-3 hover:bg-inverse-primary transition-colors duration-300">
+<span class="material-symbols-outlined">photo_camera</span>
+<span>Capturer l'Instant</span>
+</button>
+<p class="text-center font-label-sm text-label-sm text-secondary mt-4">Partagez vos photos avec les mariés</p>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface/90 dark:bg-surface-container-lowest/90 backdrop-blur-2xl fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] rounded-full bg-surface-container-low dark:bg-surface-dim border border-outline-variant/10 shadow-xl fixed bottom-6 left-0 right-0 z-50 flex justify-around items-center px-6 py-3 max-w-md mx-auto">
+<!-- Active Tab: Agenda -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold scale-110 Active: scale-95 duration-150 group" href="#">
+<div class="px-4 py-1 rounded-full bg-primary/10 mb-1">
+<span class="material-symbols-outlined block group-hover:scale-105 transition-transform" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+</div>
+<span class="font-label-sm text-label-sm-mobile">Agenda</span>
+</a>
+<!-- Inactive Tab: Backstage -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim opacity-60 hover:scale-105 transition-transform Active: scale-95 duration-150 group" href="#">
+<div class="px-4 py-1 mb-1">
+<span class="material-symbols-outlined block group-hover:scale-105 transition-transform">theater_comedy</span>
+</div>
+<span class="font-label-sm text-label-sm-mobile">Backstage</span>
+</a>
+<!-- Inactive Tab: Floorplan -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim opacity-60 hover:scale-105 transition-transform Active: scale-95 duration-150 group" href="#">
+<div class="px-4 py-1 mb-1">
+<span class="material-symbols-outlined block group-hover:scale-105 transition-transform">layers</span>
+</div>
+<span class="font-label-sm text-label-sm-mobile">Floorplan</span>
+</a>
+<!-- Inactive Tab: Guests -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim opacity-60 hover:scale-105 transition-transform Active: scale-95 duration-150 group" href="#">
+<div class="px-4 py-1 mb-1">
+<span class="material-symbols-outlined block group-hover:scale-105 transition-transform">group</span>
+</div>
+<span class="font-label-sm text-label-sm-mobile">Guests</span>
+</a>
+</nav>
+</body></html>

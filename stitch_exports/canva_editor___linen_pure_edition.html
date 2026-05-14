@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Design Hub - Prestige Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed-variant": "#584324",
+                      "surface-container": "#efeeeb",
+                      "on-secondary-fixed-variant": "#49473f",
+                      "primary-fixed": "#feddb3",
+                      "tertiary-container": "#b9b9b7",
+                      "surface-bright": "#faf9f6",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary": "#5e5e5d",
+                      "tertiary-fixed-dim": "#c7c6c4",
+                      "on-tertiary": "#ffffff",
+                      "surface-variant": "#e3e2e0",
+                      "secondary-container": "#e4dfd5",
+                      "on-secondary-fixed": "#1d1c15",
+                      "outline-variant": "#d1c5b8",
+                      "on-surface-variant": "#4d453c",
+                      "primary-fixed-dim": "#e1c299",
+                      "on-primary-container": "#5b4526",
+                      "on-background": "#1a1c1a",
+                      "secondary-fixed": "#e7e2d8",
+                      "primary-container": "#d2b48c",
+                      "on-primary-fixed": "#281801",
+                      "surface-container-high": "#e9e8e5",
+                      "on-surface": "#1a1c1a",
+                      "on-tertiary-fixed": "#1b1c1b",
+                      "inverse-surface": "#2f312f",
+                      "inverse-primary": "#e1c299",
+                      "error-container": "#ffdad6",
+                      "on-error-container": "#93000a",
+                      "outline": "#7f766a",
+                      "surface": "#faf9f6",
+                      "on-secondary-container": "#65635a",
+                      "surface-container-low": "#f4f3f1",
+                      "on-tertiary-container": "#494948",
+                      "on-error": "#ffffff",
+                      "secondary-fixed-dim": "#cac6bc",
+                      "surface-container-highest": "#e3e2e0",
+                      "surface-tint": "#725a39",
+                      "on-secondary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "secondary": "#615e56",
+                      "on-primary": "#ffffff",
+                      "background": "#faf9f6",
+                      "tertiary-fixed": "#e3e2e0",
+                      "inverse-on-surface": "#f2f1ee",
+                      "surface-dim": "#dbdad7",
+                      "primary": "#725a39",
+                      "on-tertiary-fixed-variant": "#464746"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "gutter": "24px",
+                      "unit": "8px",
+                      "section-padding": "80px",
+                      "container-max": "1140px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Newsreader"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Newsreader"
+                      ],
+                      "headline-lg": [
+                              "Newsreader"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-xl": [
+                              "Newsreader"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-xl": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "300"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="h-full bg-background text-on-surface font-body-md text-body-md antialiased overflow-hidden flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-full py-12 px-8 bg-surface-bright dark:bg-inverse-surface fixed left-0 w-80 border-r-[0.5px] border-outline-variant z-40">
+<div class="mb-12">
+<h1 class="font-display-lg text-headline-md text-primary mb-2">Prestige Admin</h1>
+<p class="text-on-surface-variant text-sm">Managing the Grand Gala</p>
+</div>
+<ul class="flex flex-col space-y-4 flex-grow">
+<li>
+<a class="flex items-center px-4 py-3 text-on-surface-variant hover:bg-surface-container-low font-body-md text-body-md uppercase tracking-widest hover:pl-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4">group</span>
+                    Guest Hub
+                </a>
+</li>
+<li>
+<a class="flex items-center px-4 py-3 text-on-surface-variant hover:bg-surface-container-low font-body-md text-body-md uppercase tracking-widest hover:pl-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4">hub</span>
+                    Circles CRM
+                </a>
+</li>
+<li>
+<a class="flex items-center px-4 py-3 text-on-surface-variant hover:bg-surface-container-low font-body-md text-body-md uppercase tracking-widest hover:pl-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4">storefront</span>
+                    Vendors
+                </a>
+</li>
+<li>
+<a class="flex items-center px-4 py-3 text-on-surface-variant hover:bg-surface-container-low font-body-md text-body-md uppercase tracking-widest hover:pl-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4">chat_bubble</span>
+                    Backstage
+                </a>
+</li>
+<li>
+<a class="flex items-center px-4 py-3 text-primary bg-surface-container-high dark:bg-secondary-container rounded-none border-r-2 border-primary font-body-md text-body-md uppercase tracking-widest hover:pl-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4" style="font-variation-settings: 'FILL' 1;">palette</span>
+                    Design Hub
+                </a>
+</li>
+<li class="mt-auto">
+<a class="flex items-center px-4 py-3 text-on-surface-variant hover:bg-surface-container-low font-body-md text-body-md uppercase tracking-widest hover:pl-2 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4">settings</span>
+                    Settings
+                </a>
+</li>
+</ul>
+<button class="mt-8 w-full bg-primary-container text-on-primary-container py-4 font-label-sm text-label-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
+            NEW EVENT
+        </button>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-80 flex flex-col h-full bg-surface-container-lowest">
+<!-- Editor Top Bar -->
+<header class="flex justify-between items-center px-6 py-4 border-b-[0.5px] border-outline-variant bg-surface-bright">
+<div class="flex items-center space-x-6">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-outline">description</span>
+<span class="font-body-md text-body-md text-on-surface">Eleanor &amp; James Invitation.pdf</span>
+</div>
+<div class="h-6 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center space-x-4">
+<button class="flex items-center space-x-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="font-body-md text-body-md">Newsreader</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<div class="flex items-center border border-outline-variant rounded-sm overflow-hidden">
+<button class="px-2 py-1 text-on-surface-variant hover:bg-surface-container-low transition-colors">-</button>
+<input class="w-12 text-center border-none bg-transparent font-body-md text-body-md p-0 focus:ring-0 text-on-surface" type="text" value="48"/>
+<button class="px-2 py-1 text-on-surface-variant hover:bg-surface-container-low transition-colors">+</button>
+</div>
+<button class="w-6 h-6 rounded-sm bg-[#584324] border border-outline-variant"></button>
+<div class="flex items-center space-x-2 border-l border-outline-variant pl-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">format_align_left</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">format_align_center</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="flex items-center -space-x-2 mr-4">
+<div class="w-8 h-8 rounded-full bg-surface-variant border-2 border-surface-bright flex items-center justify-center text-xs font-medium text-on-surface-variant">EJ</div>
+<div class="w-8 h-8 rounded-full bg-primary-container border-2 border-surface-bright flex items-center justify-center text-xs font-medium text-on-primary-container">PA</div>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2"><span class="material-symbols-outlined">visibility</span></button>
+<button class="bg-primary-container text-on-primary-container px-6 py-2 font-label-sm text-label-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
+                    Share
+                </button>
+<button class="border border-outline-variant text-on-surface px-6 py-2 font-label-sm text-label-sm uppercase tracking-widest hover:bg-surface-container-low transition-colors">
+                    Export
+                </button>
+</div>
+</header>
+<!-- Editor Workspace -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left Toolbar -->
+<aside class="w-20 bg-surface-bright border-r-[0.5px] border-outline-variant flex flex-col items-center py-6 space-y-8 overflow-y-auto">
+<button class="flex flex-col items-center space-y-1 text-on-surface-variant hover:text-primary transition-colors group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">view_cozy</span>
+<span class="text-[10px] uppercase tracking-wider">Templates</span>
+</button>
+<button class="flex flex-col items-center space-y-1 text-primary group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" style="font-variation-settings: 'FILL' 1;">category</span>
+<span class="text-[10px] uppercase tracking-wider font-medium">Elements</span>
+</button>
+<button class="flex flex-col items-center space-y-1 text-on-surface-variant hover:text-primary transition-colors group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">text_fields</span>
+<span class="text-[10px] uppercase tracking-wider">Text</span>
+</button>
+<button class="flex flex-col items-center space-y-1 text-on-surface-variant hover:text-primary transition-colors group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">palette</span>
+<span class="text-[10px] uppercase tracking-wider">Brand Kit</span>
+</button>
+<button class="flex flex-col items-center space-y-1 text-on-surface-variant hover:text-primary transition-colors group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">cloud_upload</span>
+<span class="text-[10px] uppercase tracking-wider">Uploads</span>
+</button>
+</aside>
+<!-- Elements Panel (Flyout) -->
+<div class="w-72 bg-surface-container-lowest border-r-[0.5px] border-outline-variant flex flex-col">
+<div class="p-4 border-b border-outline-variant">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-outline-variant text-sm">search</span>
+<input class="w-full pl-9 pr-4 py-2 bg-surface-container-low border-none rounded-sm font-body-md text-body-md text-on-surface placeholder:text-outline-variant focus:ring-1 focus:ring-primary" placeholder="Search elements..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4">
+<h3 class="font-label-sm text-label-sm uppercase text-on-surface-variant mb-4">Recently Used</h3>
+<div class="grid grid-cols-2 gap-2 mb-8">
+<div class="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant">
+<img alt="Floral vector element" class="w-16 h-16 object-contain opacity-80 mix-blend-multiply" data-alt="A delicate, minimalist vector illustration of a botanical branch with small leaves, rendered in a warm dark grey on a transparent background, suitable for an elegant wedding invitation design in a light-mode interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL2UG82m1003yBfIB81l8dpGP_jq_qyRyfXv7wI1Y4V5kzM0mCqGBmqFZZRiJ30L4lX7nYfPG3aQizSVDOQDBxMDFhbgzc97PEEt6HeAG489pyB8tEXjFieT5gyV5L-JwYlVQTC_ZU90rBIZaWb50PujCYVfTgDFV9DKTySCDBjDxdh55S0ezSSe09XSrN-pCj8s99djaW8UsjlKuKdI5U39hG2Ghd4Qpv3Cqxa6AU6vcaME9x3F7kYnFYSWqZRJs9dyIRCL6a8djh"/>
+</div>
+<div class="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant">
+<img alt="Gold foil texture" class="w-16 h-16 object-cover opacity-80" data-alt="A subtle, high-quality gold foil texture swatch, reflecting soft light, designed to be used as an accent material within a clean, minimalist digital design tool interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpTSHc4v8_9bpEuLMUwMl2aeIahSsRdbdMm1IEFfQVTZPRUItzk14DYmSs4tJGEi90nVADtvNA71e_zjwcNWXFGPB4pVwpNoaW1YOgvIbMjX6nG_CfKj7-kFqBIUeGgAFXWzLKlpp4PxfkX_Ba8zAfxpORhtPs9xGT2qFPLgxJ_LtDPw9tkGmZO00oiaWC-S-JbnE6q4be4La2pS0iLok69EBrlvV8XLQfvfM2OWxpMGlvWvABeWy6JTRuGsFT6U03c2upnGvHzM4c"/>
+</div>
+</div>
+<h3 class="font-label-sm text-label-sm uppercase text-on-surface-variant mb-4">Botanicals</h3>
+<div class="grid grid-cols-2 gap-2">
+<div class="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant">
+<span class="material-symbols-outlined text-outline text-3xl font-light">local_florist</span>
+</div>
+<div class="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant">
+<span class="material-symbols-outlined text-outline text-3xl font-light">spa</span>
+</div>
+<div class="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant">
+<span class="material-symbols-outlined text-outline text-3xl font-light">grass</span>
+</div>
+<div class="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant">
+<span class="material-symbols-outlined text-outline text-3xl font-light">park</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Canvas Area -->
+<div class="flex-1 bg-surface-container-low overflow-auto relative flex items-center justify-center p-8">
+<!-- Zoom Controls -->
+<div class="absolute bottom-6 right-6 flex items-center bg-surface-bright border border-outline-variant rounded-sm shadow-sm">
+<button class="px-3 py-1 text-on-surface-variant hover:bg-surface-container-low transition-colors">-</button>
+<span class="font-body-md text-body-md text-on-surface px-2">85%</span>
+<button class="px-3 py-1 text-on-surface-variant hover:bg-surface-container-low transition-colors">+</button>
+</div>
+<!-- The Canvas (Invitation Design) -->
+<div class="bg-white w-[500px] h-[700px] shadow-sm relative overflow-hidden" style="box-shadow: 0 4px 24px -4px rgba(0,0,0,0.05);">
+<!-- Bleed lines indicator -->
+<div class="absolute inset-4 border border-blue-200/50 border-dashed pointer-events-none"></div>
+<div class="absolute inset-0 p-12 flex flex-col items-center justify-center text-center">
+<img alt="Top floral arch" class="w-48 h-auto opacity-70 mb-8 mix-blend-multiply" data-alt="An elegant, minimalist illustration of a botanical floral arch, curving gently. Rendered in a soft, warm grey ink style. Designed as a top decorative element for a high-end wedding invitation within a sophisticated digital canvas." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSVvdJROOv77ct6LAti5aKSv0ndMZAuIMkvmFmGO3RWAvTzWPK2FjXp0_E49gqZpGXaP5bdZqIfmODfpjfK2R7mqrfL_SCgDkKDfVxvDwDBZELgZcCXZFTVKYDdfdxzZNy8Mm8ZLqhDALbrqHdi5ej-cpBAK0zpeCbBpvGUM1rgTNjLdIn6BCVR6ZRBbN4liHO79drt5uIsG6B3nYlaOpkLfTMglBw4QmSVx_2bzzD0VKgxt5Z66TLus6UqfyRAmJrKMyhhlWPA0hU"/>
+<p class="font-label-sm text-label-sm uppercase tracking-[0.2em] text-[#584324] mb-6">Together with their families</p>
+<h2 class="font-headline-xl text-headline-xl text-[#281801] mb-4">Eleanor <span class="italic font-light">&amp;</span> James</h2>
+<p class="font-body-md text-body-md text-[#49473f] mb-8 leading-relaxed max-w-[250px]">
+                            request the honor of your presence<br/>at their wedding celebration
+                        </p>
+<div class="border-t border-b border-[#d1c5b8] py-4 mb-8 w-full max-w-[200px]">
+<p class="font-label-sm text-label-sm uppercase tracking-widest text-[#584324] mb-1">Saturday, Oct 14</p>
+<p class="font-body-md text-body-md text-[#49473f]">Four o'clock in the afternoon</p>
+</div>
+<p class="font-body-md text-body-md text-[#49473f] uppercase tracking-wider text-sm mb-1">The Grand Estate</p>
+<p class="font-body-md text-body-md text-[#49473f] text-sm">Napa Valley, California</p>
+<!-- Selection Box Overlay (Simulating Canva active element) -->
+<div class="absolute inset-x-8 top-[20%] bottom-[60%] border border-primary pointer-events-none">
+<div class="absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border border-primary rounded-full"></div>
+<div class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border border-primary rounded-full"></div>
+<div class="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border border-primary rounded-full"></div>
+<div class="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border border-primary rounded-full"></div>
+<div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-white border border-outline-variant rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-outline">rotate_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Sidebar (Layers/Pages) -->
+<aside class="w-64 bg-surface-bright border-l-[0.5px] border-outline-variant flex flex-col">
+<div class="flex border-b border-outline-variant">
+<button class="flex-1 py-3 text-center border-b-2 border-primary font-label-sm text-label-sm uppercase text-primary">Pages</button>
+<button class="flex-1 py-3 text-center text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm uppercase transition-colors">Layers</button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- Page 1 (Active) -->
+<div class="group relative">
+<div class="absolute top-2 left-2 bg-surface-container-lowest px-1.5 py-0.5 rounded-sm text-[10px] border border-outline-variant z-10">1</div>
+<div class="aspect-[3/4] bg-surface-container-low border-2 border-primary rounded-sm p-2 cursor-pointer relative overflow-hidden">
+<div class="w-full h-full bg-white flex flex-col items-center justify-center scale-50 origin-top-left shadow-sm p-4">
+<div class="w-12 h-4 bg-outline-variant/30 rounded-full mb-2"></div>
+<div class="w-24 h-6 bg-outline-variant/50 mb-2"></div>
+<div class="w-16 h-3 bg-outline-variant/30 mb-4"></div>
+<div class="w-20 h-[1px] bg-outline-variant mb-4"></div>
+</div>
+</div>
+<div class="flex justify-between items-center mt-2">
+<span class="font-body-md text-body-md text-sm text-on-surface">Invitation Front</span>
+<button class="opacity-0 group-hover:opacity-100 text-on-surface-variant hover:text-primary transition-all"><span class="material-symbols-outlined text-sm">more_vert</span></button>
+</div>
+</div>
+<!-- Page 2 -->
+<div class="group relative">
+<div class="absolute top-2 left-2 bg-surface-container-lowest px-1.5 py-0.5 rounded-sm text-[10px] border border-outline-variant z-10">2</div>
+<div class="aspect-[3/4] bg-surface-container-low border border-outline-variant rounded-sm p-2 cursor-pointer hover:border-primary/50 transition-colors relative overflow-hidden">
+<div class="w-full h-full bg-white flex flex-col items-center justify-center scale-50 origin-top-left shadow-sm p-4">
+<div class="w-16 h-4 bg-outline-variant/30 mb-6"></div>
+<div class="w-20 h-3 bg-outline-variant/30 mb-2"></div>
+<div class="w-20 h-3 bg-outline-variant/30 mb-2"></div>
+<div class="w-12 h-3 bg-outline-variant/30"></div>
+</div>
+</div>
+<div class="flex justify-between items-center mt-2">
+<span class="font-body-md text-body-md text-sm text-on-surface-variant">Details Card</span>
+<button class="opacity-0 group-hover:opacity-100 text-on-surface-variant hover:text-primary transition-all"><span class="material-symbols-outlined text-sm">more_vert</span></button>
+</div>
+</div>
+<button class="w-full py-3 border border-dashed border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary transition-colors flex items-center justify-center space-x-2 rounded-sm">
+<span class="material-symbols-outlined text-sm">add</span>
+<span class="font-label-sm text-label-sm uppercase">Add Page</span>
+</button>
+</div>
+</aside>
+</div>
+</main>
+</body></html>

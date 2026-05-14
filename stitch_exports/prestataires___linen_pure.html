@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cockpit - Prestige Edition: Vendor Management</title>
+<!-- Fonts: Inter & Newsreader -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Newsreader:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e3e2e0",
+                    "inverse-on-surface": "#f2f1ee",
+                    "surface-container": "#efeeeb",
+                    "surface": "#faf9f6",
+                    "tertiary-fixed": "#e3e2e0",
+                    "on-error-container": "#93000a",
+                    "primary": "#725a39",
+                    "surface-tint": "#725a39",
+                    "on-tertiary-container": "#494948",
+                    "secondary-fixed-dim": "#cac6bc",
+                    "on-background": "#1a1c1a",
+                    "surface-bright": "#faf9f6",
+                    "surface-container-low": "#f4f3f1",
+                    "primary-container": "#d2b48c",
+                    "primary-fixed": "#feddb3",
+                    "surface-container-high": "#e9e8e5",
+                    "on-secondary-fixed-variant": "#49473f",
+                    "on-primary-fixed": "#281801",
+                    "secondary": "#615e56",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#dbdad7",
+                    "on-surface": "#1a1c1a",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#2f312f",
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "outline": "#7f766a",
+                    "on-tertiary-fixed-variant": "#464746",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#e1c299",
+                    "tertiary-container": "#b9b9b7",
+                    "surface-variant": "#e3e2e0",
+                    "secondary-container": "#e4dfd5",
+                    "on-primary-fixed-variant": "#584324",
+                    "on-secondary-fixed": "#1d1c15",
+                    "on-surface-variant": "#4d453c",
+                    "on-tertiary-fixed": "#1b1c1b",
+                    "background": "#faf9f6",
+                    "primary-fixed-dim": "#e1c299",
+                    "on-secondary-container": "#65635a",
+                    "outline-variant": "#d1c5b8",
+                    "tertiary-fixed-dim": "#c7c6c4",
+                    "on-primary-container": "#5b4526",
+                    "tertiary": "#5e5e5d",
+                    "secondary-fixed": "#e7e2d8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "section-padding": "80px",
+                    "margin-mobile": "16px",
+                    "unit": "8px",
+                    "container-max": "1140px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Newsreader"],
+                    "headline-lg": ["Newsreader"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Newsreader"],
+                    "label-sm": ["Inter"],
+                    "headline-xl": ["Newsreader"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                    "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                    "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                    "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                    "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "400" }],
+                    "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                    "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { background-color: theme('colors.surface'); color: theme('colors.on-surface'); }
+    </style>
+</head>
+<body class="antialiased min-h-screen selection:bg-primary-container selection:text-on-primary-container">
+<!-- DESKTOP: SideNavBar -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface dark:bg-surface-dim bg-surface-container-low dark:bg-surface-dim py-unit px-4 z-40">
+<div class="mb-12 mt-6 px-4">
+<h2 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Prestige Edition</h2>
+<p class="font-body-md text-body-md text-secondary mt-1">Wedding Cockpit</p>
+</div>
+<div class="flex-1 space-y-2">
+<!-- Guest Hub -->
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-secondary dark:text-secondary-fixed-dim opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-300 ease-in-out font-body-md text-body-md tracking-wide" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span>Guest Hub</span>
+</a>
+<!-- Circles CRM -->
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-secondary dark:text-secondary-fixed-dim opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-300 ease-in-out font-body-md text-body-md tracking-wide" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span>Circles CRM</span>
+</a>
+<!-- Vendors (ACTIVE) -->
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-primary dark:text-primary-fixed font-bold border-r-2 border-primary bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-300 ease-in-out font-body-md text-body-md tracking-wide" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">storefront</span>
+<span>Vendors</span>
+</a>
+<!-- Backstage -->
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-secondary dark:text-secondary-fixed-dim opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-300 ease-in-out font-body-md text-body-md tracking-wide" href="#">
+<span class="material-symbols-outlined">theater_comedy</span>
+<span>Backstage</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-secondary dark:text-secondary-fixed-dim opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-300 ease-in-out font-body-md text-body-md tracking-wide" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</div>
+<div class="mt-auto pb-6 px-4 flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="Planner Profile" class="w-full h-full object-cover" data-alt="A softly lit portrait of a sophisticated wedding planner in a minimalist, light-filled atelier setting. The lighting is warm and natural, casting gentle shadows that emphasize a serene, professional mood. The palette is dominated by off-whites and soft linen tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrZRy7wueGdsYzAbMy88DR29dx-4Kh2VLkLm5TiHZkbmLSsq9Y1EgATxy3qzzCJ6u1n19y07tn8Pr_90iMtjMYwb9Q9splwM0TjLY5cOHUHkQuiVs_Ceg8-0w_PwIRQEUS8fimyy3tLO2_XKRQ_46EjZzNk_Iiq0Y0q4rD1S9uREbuYsR9AMjAsBzq-GyodU4g_xGbdijUREFjxxO6c3A6Hu9wBeTT5XSppYO0tcDAEQldggZrh2jR8mHtCoeaK3WtuIxxbAAvgPr-"/>
+</div>
+<span class="font-body-md text-body-md text-secondary">Planner Profile</span>
+</div>
+</nav>
+<!-- MOBILE: TopAppBar -->
+<header class="md:hidden docked full-width top-0 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl bg-transparent flex justify-between items-center w-full px-section-padding py-gutter max-w-container-max mx-auto z-40 fixed">
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold tracking-tight">Cockpit - Prestige Edition</h1>
+<div class="flex items-center space-x-4">
+<button class="text-secondary dark:text-secondary-fixed-dim hover:opacity-80 transition-opacity transition-all duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-secondary dark:text-secondary-fixed-dim hover:opacity-80 transition-opacity transition-all duration-200">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- MAIN CANVAS -->
+<main class="md:ml-64 pt-24 md:pt-16 px-4 md:px-12 lg:px-section-padding pb-32 max-w-container-max mx-auto">
+<!-- Header Section -->
+<header class="mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface mb-4">Curated Partners</h1>
+<p class="font-body-lg text-body-lg text-secondary max-w-2xl leading-relaxed">
+                    Manage the artistic and logistical pillars of the event. Track contracts, payments, and creative briefs in one serene space.
+                </p>
+</div>
+<button class="inline-flex items-center justify-center space-x-2 bg-primary-container text-on-primary-container px-6 py-3 rounded-full hover:bg-inverse-primary transition-colors duration-300 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-sm">add</span>
+<span>Invite Partner</span>
+</button>
+</header>
+<!-- Bento Grid: Vendor Cards -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Card 1: Maison Culinaria -->
+<article class="bg-surface-container-low rounded-xl p-8 flex flex-col h-full transition-colors duration-300 hover:bg-surface-container group">
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center space-x-4">
+<div class="w-16 h-16 rounded-full overflow-hidden bg-surface-variant flex-shrink-0">
+<img alt="Maison Culinaria" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A highly stylized top-down view of gourmet culinary ingredients arranged on a raw linen tablecloth. The lighting is soft, diffused, and natural, creating a zen, organic minimalist mood. Warm beige, soft greens, and muted terracotta tones dominate the high-end aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGvD4hTYxtYwnlX45Pwie-XsUcu18MtV5jc3UFlOV0k0Q7txHy1vEYqI7vDUJlxggR-FCeH5vwwqiwKp3FQcOEWn_dfJhELTUFmhPnQkh4c-ymSopgcsNlTpbiGILgW2Q1otn6P2nE4zoO8OcTUuIN4rlskcfq9EIjvLeepIvG7AtVUE8tXBaY1wfU2wYXeZHD-a4lQkxDkkUj51DESJ6zKX5a4RFX83CIOTAfonc3SCV_yWabTcpTil5jV_LScqce3CRTtMrJmDWR"/>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Maison Culinaria</h3>
+<p class="font-body-md text-body-md text-secondary">Traiteur</p>
+</div>
+</div>
+<span class="bg-surface text-primary px-3 py-1 rounded-full font-label-sm text-label-sm border border-outline-variant/30">Contract Signed</span>
+</div>
+<div class="mt-auto space-y-6">
+<div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant border-b border-outline-variant/20 pb-4">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">receipt_long</span> Invoice Total</span>
+<span class="font-medium">€24,500</span>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="font-label-sm text-label-sm text-secondary">Payment Progress</span>
+<span class="font-body-md text-body-md text-on-surface">50%</span>
+</div>
+<div class="w-full h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/2 rounded-full"></div>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 2: Studio Lumière -->
+<article class="bg-surface-container-low rounded-xl p-8 flex flex-col h-full transition-colors duration-300 hover:bg-surface-container group">
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center space-x-4">
+<div class="w-16 h-16 rounded-full overflow-hidden bg-surface-variant flex-shrink-0">
+<img alt="Studio Lumière" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="An artistic detail shot of a vintage camera lens resting on textured, handmade paper. The setting implies a minimalist photography studio bathed in warm, late-afternoon sunlight. The shadows are long and soft, emphasizing an organic, premium visual identity characterized by warm sepia and charcoal tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClFaIyDh1a5HuxEu_Gp0LRv3JpteGefbHJW4yOl2TwahLlUcPKzsvq6XzfjPb1wsDczAKmQbbnWWw2yNfejd3_3uXQWMMc4xtliGfKMasA4UwXsjFFu27LElWu3EChJZyi2QlHYkja3IpuEBXg91Y24RpiGHkFG5UE5kwxuvYhqdk-GQ0UigtpmCvqPVVmrJ2FAZQW0rr6gR_TPVWWDw8XrKCuvCK3Qrk_l-xYGTiyR4g-uogrLI8_1sDsgs4kZyjYG1S5DyVkHQQG"/>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Studio Lumière</h3>
+<p class="font-body-md text-body-md text-secondary">Photographe</p>
+</div>
+</div>
+<span class="bg-surface text-primary px-3 py-1 rounded-full font-label-sm text-label-sm border border-outline-variant/30">Under Review</span>
+</div>
+<div class="mt-auto space-y-6">
+<div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant border-b border-outline-variant/20 pb-4">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">receipt_long</span> Invoice Total</span>
+<span class="font-medium">€8,200</span>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="font-label-sm text-label-sm text-secondary">Payment Progress</span>
+<span class="font-body-md text-body-md text-on-surface">20%</span>
+</div>
+<div class="w-full h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/5 rounded-full"></div>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 3: Echo Collective -->
+<article class="bg-surface-container-low rounded-xl p-8 flex flex-col h-full transition-colors duration-300 hover:bg-surface-container group">
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center space-x-4">
+<div class="w-16 h-16 rounded-full overflow-hidden bg-surface-variant flex-shrink-0 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]">album</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Echo Collective</h3>
+<p class="font-body-md text-body-md text-secondary">DJ &amp; Entertainment</p>
+</div>
+</div>
+<span class="bg-surface text-primary px-3 py-1 rounded-full font-label-sm text-label-sm border border-outline-variant/30">Contract Signed</span>
+</div>
+<div class="mt-auto space-y-6">
+<div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant border-b border-outline-variant/20 pb-4">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">receipt_long</span> Invoice Total</span>
+<span class="font-medium">€4,500</span>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="font-label-sm text-label-sm text-secondary">Payment Progress</span>
+<span class="font-body-md text-body-md text-on-surface">100%</span>
+</div>
+<div class="w-full h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-full rounded-full"></div>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 4: Botanic Arts -->
+<article class="bg-surface-container-low rounded-xl p-8 flex flex-col h-full transition-colors duration-300 hover:bg-surface-container group">
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center space-x-4">
+<div class="w-16 h-16 rounded-full overflow-hidden bg-surface-variant flex-shrink-0">
+<img alt="Botanic Arts" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A macro shot of delicate, dried floral arrangements resting on smooth, polished stone. The aesthetic is zen and organic minimalist, lit by diffuse, high-key natural light. The color palette focuses on muted earthy tones, crisp whites, and subtle hints of faded green, reflecting a premium, tranquil atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBe_QOo0MhVV-rO5RnPSlzPDVIHAzaXtRZ2NPjxt4vMAW-ygZoEEptxca_TvV6qKq7x3WuablPTkYrPoI33F1EklU51bioz1UL_qthUf0KyzdpIhmMlumSMTESuUdv3K_EARPveZq3DypkW1Af1ih9yc_du6DylUAOOTvvLupB0QLwCF09c-Pmm-CF5UfzEu0EVxRCl4PgBBCGA-qM8XUsn8f4DbgTmks1c5HxFJExfHb_dGeUstuWMNO3e6ds1UyMHUTdixoWvR1Q6"/>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Botanic Arts</h3>
+<p class="font-body-md text-body-md text-secondary">Design Floral</p>
+</div>
+</div>
+<span class="bg-surface text-secondary px-3 py-1 rounded-full font-label-sm text-label-sm border border-outline-variant/30">Awaiting Signature</span>
+</div>
+<div class="mt-auto space-y-6">
+<div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant border-b border-outline-variant/20 pb-4">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">receipt_long</span> Invoice Total</span>
+<span class="font-medium">€12,000</span>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="font-label-sm text-label-sm text-secondary">Payment Progress</span>
+<span class="font-body-md text-body-md text-on-surface">0%</span>
+</div>
+<div class="w-full h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-0 rounded-full"></div>
+</div>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- MOBILE: BottomNavBar -->
+<nav class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] rounded-full bg-surface/90 dark:bg-surface-container-lowest/90 backdrop-blur-2xl bg-surface-container-low dark:bg-surface-dim border border-outline-variant/10 shadow-xl fixed bottom-6 left-0 right-0 z-50 flex justify-around items-center px-6 py-3 max-w-md mx-auto">
+<!-- Agenda -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim opacity-60 hover:scale-105 transition-transform font-label-sm text-label-sm-mobile" href="#">
+<span class="material-symbols-outlined mb-1">calendar_today</span>
+<span>Agenda</span>
+</a>
+<!-- Backstage (ACTIVE fallback for Vendors in mobile nav) -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold scale-110 hover:scale-105 transition-transform font-label-sm text-label-sm-mobile" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">theater_comedy</span>
+<span>Backstage</span>
+</a>
+<!-- Floorplan -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim opacity-60 hover:scale-105 transition-transform font-label-sm text-label-sm-mobile" href="#">
+<span class="material-symbols-outlined mb-1">layers</span>
+<span>Floorplan</span>
+</a>
+<!-- Guests -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim opacity-60 hover:scale-105 transition-transform font-label-sm text-label-sm-mobile" href="#">
+<span class="material-symbols-outlined mb-1">group</span>
+<span>Guests</span>
+</a>
+</nav>
+</body></html>
