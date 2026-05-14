@@ -28,6 +28,17 @@ io.on('connection', (socket) => {
 app.use(cors());
 app.use(express.json());
 
+const defaultPlanningTasks = [
+  ['J-365', 'Définir le budget de base', 'Valider l’enveloppe globale avec les mariés et les bénéficiaires.'],
+  ['J-300', 'Réserver le lieu', 'Comparer les lieux, bloquer la date et suivre l’acompte.'],
+  ['J-240', 'Sélectionner les prestataires', 'Traiteur, photo, vidéo, musique, décoration et coordination.'],
+  ['J-180', 'Construire la liste invités', 'Ajouter les invités, groupes, RSVP et besoins alimentaires.'],
+  ['J-120', 'Valider contrats et acomptes', 'Contrôler les contrats prestataires et les premiers paiements.'],
+  ['J-60', 'Finaliser plan de table et timings', 'Construire le plan de salle et le timing cérémonie/réception.'],
+  ['J-30', 'Contrôler factures et soldes', 'Vérifier les montants payés, restes à payer et confirmations.'],
+  ['Jour J', 'Coordination terrain', 'Suivre l’accueil invités, les prestataires et les imprévus.']
+];
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'wedding-plan-backend' });
 });
@@ -96,8 +107,52 @@ app.get('/api/weddings', async (req, res) => {
 });
 
 app.post('/api/weddings', async (req, res) => {
-  const wedding = await prisma.wedding.create({ data: req.body });
-  res.json(wedding);
+  try {
+    const name = typeof req.body.name === 'string' && req.body.name.trim()
+      ? req.body.name.trim()
+      : 'Nouveau mariage';
+    const wedding = await prisma.wedding.create({
+      data: {
+        name,
+        date: req.body.date ? new Date(req.body.date) : null,
+        theme: req.body.theme || 'theme-linen-pure',
+        ownerRole: req.body.ownerRole || 'wedding_planner',
+        brideName: req.body.brideName || null,
+        groomName: req.body.groomName || null,
+        plannerName: req.body.plannerName || null,
+        beneficiaries: req.body.beneficiaries || null,
+        baseBudget: Number(req.body.baseBudget) || 0,
+        onboardingComplete: Boolean(req.body.onboardingComplete),
+        agenda: {
+          create: defaultPlanningTasks.map(([time, title, description], index) => ({
+            time,
+            title,
+            description,
+            orderIndex: index + 1,
+            isRestricted: title.toLowerCase().includes('factures'),
+            isDone: false
+          }))
+        },
+        tables: {
+          create: [
+            { name: 'T1 - Famille', topPos: 'top-20', leftPos: 'left-20', sizeClass: 'w-32 h-32', chairs: 4 },
+            { name: 'T2 - Honneur', topPos: 'top-20', leftPos: 'right-40', sizeClass: 'w-40 h-40', chairs: 6 },
+            { name: 'T3 - Amis', topPos: 'bottom-32', leftPos: 'left-1/2 -translate-x-1/2', sizeClass: 'w-32 h-32', chairs: 4 }
+          ]
+        }
+      },
+      include: {
+        agenda: { orderBy: { orderIndex: 'asc' } },
+        vendors: true,
+        guests: true,
+        tables: true
+      }
+    });
+    res.json(wedding);
+  } catch (error) {
+    console.error('Error creating wedding:', error);
+    res.status(500).json({ error: 'Failed to create wedding', message: error.message });
+  }
 });
 
 app.put('/api/weddings/:id', async (req, res) => {

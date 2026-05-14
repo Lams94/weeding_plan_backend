@@ -9,6 +9,7 @@ export default function AgencyDashboard() {
   
   const [isCreating, setIsCreating] = useState(false);
   const [newWeddingName, setNewWeddingName] = useState('');
+  const [isSubmittingProject, setIsSubmittingProject] = useState(false);
   
   // --- UPLOAD APK STATE ---
   const [uploadingApk, setUploadingApk] = useState(false);
@@ -18,11 +19,17 @@ export default function AgencyDashboard() {
     fetchWeddings();
   }, [fetchWeddings]);
 
-  const handleCreate = (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
     if (!newWeddingName.trim()) return;
-    createWedding(newWeddingName);
-    setIsCreating(false);
+    setIsSubmittingProject(true);
+    try {
+      await createWedding(newWeddingName);
+      setNewWeddingName('');
+      setIsCreating(false);
+    } finally {
+      setIsSubmittingProject(false);
+    }
   };
 
   const handleApkUpload = async (e) => {
@@ -302,6 +309,7 @@ export default function AgencyDashboard() {
               </button>
               <button 
                 type="submit"
+                disabled={isSubmittingProject}
                 className="flex-1 py-3 rounded-lg bg-primary text-on-primary hover:bg-primary/90 transition-colors"
               >
                 Créer & Ouvrir
