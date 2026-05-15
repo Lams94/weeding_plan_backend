@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import useStore from '../store/useStore';
+import { ROLES, roleLabels } from '../lib/accessControl';
+
+const roleOptions = [ROLES.SUPER_USER, ROLES.COUPLE, ROLES.WEDDING_PLANNER, ROLES.BENEFICIARY];
 
 export default function AgencyDashboard() {
   const weddings = useStore(state => state.weddings);
   const fetchWeddings = useStore(state => state.fetchWeddings);
   const setActiveWedding = useStore(state => state.setActiveWedding);
   const createWedding = useStore(state => state.createWedding);
+  const currentAccessRole = useStore(state => state.currentAccessRole);
+  const setCurrentAccessRole = useStore(state => state.setCurrentAccessRole);
   
   const [isCreating, setIsCreating] = useState(false);
   const [newWeddingName, setNewWeddingName] = useState('');
@@ -63,6 +68,7 @@ export default function AgencyDashboard() {
 
   // --- STATISTIQUES GLOBALES AGENCE ---
   const totalProjects = weddings.length;
+  const isAgencyProfile = currentAccessRole === ROLES.WEDDING_PLANNER || currentAccessRole === ROLES.SUPER_USER;
   
   // Calcul du budget total géré (Somme des devis de tous les prestataires de tous les mariages)
   const totalManagedBudget = weddings.reduce((sum, w) => {
@@ -83,6 +89,10 @@ export default function AgencyDashboard() {
   
   // Filtrer les tâches non faites et les trier (on simule l'urgence par l'ordre chronologique)
   const upcomingTasks = allTasks.filter(t => !t.isDone).slice(0, 5); // Les 5 prochaines
+  const primaryWedding = weddings[0];
+  const coupleBudget = primaryWedding?.baseBudget || primaryWedding?.vendors?.reduce((sum, vendor) => sum + vendor.budget, 0) || 0;
+  const couplePaid = primaryWedding?.vendors?.reduce((sum, vendor) => sum + vendor.paid, 0) || 0;
+  const coupleTasks = (primaryWedding?.agenda || []).filter(task => !task.isDone).slice(0, 5);
 
   return (
     <div className="min-h-screen bg-surface flex flex-col items-center">
@@ -92,19 +102,120 @@ export default function AgencyDashboard() {
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-primary text-3xl">diamond</span>
           <div>
-            <h1 className="font-headline-lg text-headline-lg text-on-surface">Prestige Agency Hub</h1>
-            <p className="font-label-sm text-label-sm text-secondary tracking-widest uppercase">Multi-Project Command Center</p>
+            <h1 className="font-headline-lg text-headline-lg text-on-surface">{isAgencyProfile ? 'Prestige Agency Hub' : 'Mon mariage'}</h1>
+            <p className="font-label-sm text-label-sm text-secondary tracking-widest uppercase">{isAgencyProfile ? 'Multi-Project Command Center' : 'Espace mariés'}</p>
           </div>
         </div>
-        <button 
-          onClick={() => setIsCreating(true)}
-          className="bg-primary text-on-primary px-6 py-3 rounded-full font-label-sm flex items-center gap-2 hover:bg-primary/90 transition-colors shadow-sm"
-        >
-          <span className="material-symbols-outlined text-[18px]">add</span>
-          Nouveau Projet
-        </button>
+        <div className="flex items-center gap-3">
+          <select value={currentAccessRole} onChange={event => setCurrentAccessRole(event.target.value)} className="bg-surface-container-low border border-outline-variant rounded-full px-4 py-3 text-sm text-on-surface">
+            {roleOptions.map(role => <option key={role} value={role}>{roleLabels[role]}</option>)}
+          </select>
+          <button 
+            onClick={() => setIsCreating(true)}
+            className="bg-primary text-on-primary px-6 py-3 rounded-full font-label-sm flex items-center gap-2 hover:bg-primary/90 transition-colors shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            {isAgencyProfile ? 'Nouveau Projet' : 'Nouveau mariage'}
+          </button>
+        </div>
       </header>
 
+      {!isAgencyProfile && (
+        <main className="w-full max-w-[1200px] px-8 py-12 grid grid-cols-1 xl:grid-cols-12 gap-8">
+          <section className="xl:col-span-8 space-y-8">
+            <div>
+              <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-3">Projet du couple</p>
+              <h2 className="font-display-md text-display-md text-on-background">{primaryWedding?.name || 'Mon mariage'}</h2>
+            </div>
+
+            {primaryWedding ? (
+              <div onClick={() => setActiveWedding(primaryWedding)} className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 cursor-pointer hover:border-primary hover:shadow-lg transition-all group relative overflow-hidden">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 className="font-headline-md text-headline-md text-on-surface mb-1">{primaryWedding.name}</h3>
+                    <p className="font-label-sm text-secondary flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+                      {primaryWedding.date ? new Date(primaryWedding.date).toLocaleDateString() : 'Date à définir'}
+                    </p>
+                  </div>
+                  <span className="material-symbols-outlined text-outline group-hover:text-primary transition-colors">arrow_forward</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-surface p-4 rounded-lg border border-outline-variant/50">
+                    <p className="text-[10px] uppercase tracking-widest text-secondary mb-1">Invités</p>
+                    <p className="font-body-lg font-medium text-on-surface">{primaryWedding.guests?.filter(g => g.status === 'Confirmed').length || 0} <span className="text-outline text-sm">/ {primaryWedding.guests?.length || 0}</span></p>
+                  </div>
+                  <div className="bg-surface p-4 rounded-lg border border-outline-variant/50">
+                    <p className="text-[10px] uppercase tracking-widest text-secondary mb-1">Budget prévu</p>
+                    <p className="font-body-lg font-medium text-on-surface">{coupleBudget.toLocaleString()}€</p>
+                  </div>
+                  <div className="bg-surface p-4 rounded-lg border border-outline-variant/50">
+                    <p className="text-[10px] uppercase tracking-widest text-secondary mb-1">Déjà payé</p>
+                    <p className="font-body-lg font-medium text-on-surface">{couplePaid.toLocaleString()}€</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center p-12 border border-dashed border-outline-variant rounded-xl text-on-surface-variant">
+                <span className="material-symbols-outlined text-4xl mb-2 opacity-50">favorite</span>
+                <p>Aucun mariage créé. Commencez par “Nouveau mariage”.</p>
+              </div>
+            )}
+          </section>
+
+          <aside className="xl:col-span-4 space-y-8">
+            <div className="bg-surface-container-high border border-outline-variant rounded-xl p-6">
+              <h3 className="font-headline-sm text-headline-sm text-on-surface mb-6 flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">account_balance_wallet</span>
+                Budget
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <p className="font-label-sm text-secondary uppercase tracking-widest mb-1">Enveloppe de base</p>
+                  <p className="font-display-sm text-display-sm text-on-background">{coupleBudget.toLocaleString()} €</p>
+                </div>
+                <div className="pt-4 border-t border-outline-variant/30">
+                  <p className="font-label-sm text-secondary uppercase tracking-widest mb-1">Paiements prestataires</p>
+                  <p className="font-headline-lg text-primary">{couplePaid.toLocaleString()} €</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-surface border border-outline-variant rounded-xl p-6 shadow-sm">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+                  <span className="material-symbols-outlined text-error">notification_important</span>
+                  Prochaines échéances
+                </h3>
+                <span className="bg-error/10 text-error px-2 py-1 rounded-full text-xs font-bold">{coupleTasks.length}</span>
+              </div>
+              <div className="space-y-4">
+                {coupleTasks.length === 0 ? (
+                  <p className="text-secondary text-sm italic">Aucune tâche en attente.</p>
+                ) : (
+                  coupleTasks.map((task, idx) => (
+                    <div key={idx} className="flex gap-4 p-3 rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant/50">
+                      <div className="w-10 h-10 rounded-full bg-error/10 text-error flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="material-symbols-outlined text-[18px]">event</span>
+                      </div>
+                      <div>
+                        <p className="font-body-md text-on-surface font-medium leading-tight">{task.title}</p>
+                        <p className="font-body-sm text-secondary text-sm mt-1 flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[14px]">schedule</span>
+                          {task.time}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </aside>
+        </main>
+      )}
+
+      {isAgencyProfile && (
       <main className="w-full max-w-[1400px] px-8 py-12 grid grid-cols-1 xl:grid-cols-12 gap-8">
         
         {/* Colonne Principale: Projets en cours */}
@@ -282,6 +393,7 @@ export default function AgencyDashboard() {
         </div>
 
       </main>
+      )}
 
       {/* Modal de création (similaire au ProjectSelector original mais en popup) */}
       {isCreating && (
