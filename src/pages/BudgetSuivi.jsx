@@ -233,6 +233,7 @@ export default function BudgetSuivi() {
             {vendors.map(vendor => {
               const vendorPaidRate = vendor.budget > 0 ? Math.min(100, Math.round((vendor.paid / vendor.budget) * 100)) : 0;
               const form = paymentForms[vendor.id] || { label: 'Acompte', amount: '', kind: 'acompte' };
+              const vendorDocuments = budgetDocuments.filter(document => document.vendorId === vendor.id);
               return (
                 <article key={vendor.id} className="bg-surface border border-outline-variant rounded-xl p-5">
                   <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
@@ -302,7 +303,7 @@ export default function BudgetSuivi() {
                   <div className="mt-5 border-t border-outline-variant/40 pt-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div>
                       <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary">Documents liés</p>
-                      <p className="text-sm text-on-surface-variant">{(vendor.documents || []).length} document(s) classé(s) pour ce prestataire.</p>
+                      <p className="text-sm text-on-surface-variant">{vendorDocuments.length} document(s) classé(s) pour ce prestataire.</p>
                     </div>
                     <button
                       type="button"
@@ -326,6 +327,42 @@ export default function BudgetSuivi() {
                       Joindre un document
                     </button>
                   </div>
+
+                  {vendorDocuments.length > 0 && (
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {vendorDocuments.slice(0, 6).map(document => (
+                        <div key={document.id} className="bg-surface-container-low border border-outline-variant/50 rounded-lg p-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="flex flex-wrap items-center gap-2 mb-1">
+                                <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-[10px] uppercase tracking-widest">{typeLabel(document.type)}</span>
+                                {document.status === 'declined' && <span className="px-2 py-1 rounded-full bg-error/10 text-error text-[10px] uppercase tracking-widest">décliné</span>}
+                              </div>
+                              <p className="font-medium text-on-surface truncate">{document.title}</p>
+                              <p className="text-xs text-secondary mt-1">
+                                {document.amount != null ? euro.format(document.amount) : 'Montant non renseigné'}
+                                {document.fileName ? ` · ${document.fileName}` : ''}
+                              </p>
+                              {document.declinedReason && <p className="text-xs text-error mt-1 truncate">{document.declinedReason}</p>}
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              {document.documentUrl && (
+                                <a href={document.documentUrl} target="_blank" rel="noreferrer" className="text-primary hover:opacity-70">
+                                  <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+                                </a>
+                              )}
+                              <button onClick={() => deleteBudgetDocument(document.id)} className="text-error hover:opacity-70">
+                                <span className="material-symbols-outlined text-[18px]">delete</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {vendorDocuments.length > 6 && (
+                        <p className="text-sm text-on-surface-variant md:col-span-2">+ {vendorDocuments.length - 6} autre(s) document(s) visibles dans l'onglet Documents.</p>
+                      )}
+                    </div>
+                  )}
                 </article>
               );
             })}
