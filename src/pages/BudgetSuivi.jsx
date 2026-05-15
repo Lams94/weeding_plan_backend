@@ -40,6 +40,7 @@ export default function BudgetSuivi() {
   const [activeTab, setActiveTab] = useState('payments');
   const [baseBudget, setBaseBudget] = useState(activeWedding?.baseBudget || 0);
   const [paymentForms, setPaymentForms] = useState({});
+  const [quickDocumentForms, setQuickDocumentForms] = useState({});
   const [documentForm, setDocumentForm] = useState({
     title: '',
     vendorId: '',
@@ -71,6 +72,22 @@ export default function BudgetSuivi() {
     }));
   };
 
+  const updateQuickDocumentForm = (vendorId, patch) => {
+    setQuickDocumentForms(prev => ({
+      ...prev,
+      [vendorId]: {
+        title: '',
+        type: 'facture_acompte',
+        amount: '',
+        documentUrl: '',
+        fileName: '',
+        notes: '',
+        ...prev[vendorId],
+        ...patch
+      }
+    }));
+  };
+
   const submitPayment = async (event, vendorId) => {
     event.preventDefault();
     const form = paymentForms[vendorId] || {};
@@ -82,6 +99,26 @@ export default function BudgetSuivi() {
       status: 'paid'
     });
     setPaymentForms(prev => ({ ...prev, [vendorId]: { label: 'Acompte', amount: '', kind: 'acompte' } }));
+  };
+
+  const submitQuickDocument = async (event, vendor) => {
+    event.preventDefault();
+    const form = quickDocumentForms[vendor.id] || {};
+    const fallbackTitle = `${typeLabel(form.type || 'facture_acompte')} - ${vendor.name}`;
+    await addBudgetDocument({
+      vendorId: vendor.id,
+      title: form.title || fallbackTitle,
+      type: form.type || 'facture_acompte',
+      status: 'active',
+      amount: form.amount === '' || form.amount == null ? null : Number(form.amount),
+      documentUrl: form.documentUrl || '',
+      fileName: form.fileName || '',
+      notes: form.notes || ''
+    });
+    setQuickDocumentForms(prev => ({
+      ...prev,
+      [vendor.id]: { title: '', type: 'facture_acompte', amount: '', documentUrl: '', fileName: '', notes: '' }
+    }));
   };
 
   const submitDocument = async (event) => {
@@ -295,6 +332,58 @@ export default function BudgetSuivi() {
                         ))}
                       </div>
                     )}
+                  </div>
+
+                  <div className="mt-5 border-t border-outline-variant/40 pt-4">
+                    <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-3">Ajouter un document lié au paiement</p>
+                    <form onSubmit={(event) => submitQuickDocument(event, vendor)} className="grid grid-cols-1 md:grid-cols-6 gap-2">
+                      <select
+                        value={(quickDocumentForms[vendor.id]?.type) || 'facture_acompte'}
+                        onChange={event => updateQuickDocumentForm(vendor.id, { type: event.target.value })}
+                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface"
+                      >
+                        <option value="devis_propose">Devis proposé</option>
+                        <option value="preuve_acompte">Preuve acompte</option>
+                        <option value="facture_acompte">Facture acompte</option>
+                        <option value="facture_finale">Facture finale</option>
+                        <option value="rib_prestataire">RIB prestataire</option>
+                        <option value="contrat">Contrat</option>
+                      </select>
+                      <input
+                        value={(quickDocumentForms[vendor.id]?.title) || ''}
+                        onChange={event => updateQuickDocumentForm(vendor.id, { title: event.target.value })}
+                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface md:col-span-2"
+                        placeholder="Titre"
+                      />
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={(quickDocumentForms[vendor.id]?.amount) || ''}
+                        onChange={event => updateQuickDocumentForm(vendor.id, { amount: event.target.value })}
+                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface"
+                        placeholder="Montant"
+                      />
+                      <input
+                        value={(quickDocumentForms[vendor.id]?.fileName) || ''}
+                        onChange={event => updateQuickDocumentForm(vendor.id, { fileName: event.target.value })}
+                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface"
+                        placeholder="Fichier"
+                      />
+                      <button className="bg-primary text-on-primary rounded-md px-3 py-2 font-label-sm uppercase tracking-widest">Joindre</button>
+                      <input
+                        value={(quickDocumentForms[vendor.id]?.documentUrl) || ''}
+                        onChange={event => updateQuickDocumentForm(vendor.id, { documentUrl: event.target.value })}
+                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface md:col-span-3"
+                        placeholder="Lien Drive / document"
+                      />
+                      <input
+                        value={(quickDocumentForms[vendor.id]?.notes) || ''}
+                        onChange={event => updateQuickDocumentForm(vendor.id, { notes: event.target.value })}
+                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface md:col-span-3"
+                        placeholder="Note rapide"
+                      />
+                    </form>
                   </div>
                 </article>
               );
