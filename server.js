@@ -503,6 +503,10 @@ app.post('/api/budget-documents', async (req, res) => {
       fileName: req.body.fileName || null,
       notes: req.body.notes || null,
       declinedReason: req.body.declinedReason || null,
+      isVerified: Boolean(req.body.isVerified),
+      verifiedAt: req.body.isVerified ? new Date() : null,
+      verifiedBy: req.body.verifiedBy || null,
+      paymentId: req.body.paymentId || null,
       requestedAt: req.body.requestedAt ? new Date(req.body.requestedAt) : null,
       receivedAt: req.body.receivedAt ? new Date(req.body.receivedAt) : null
     },
@@ -512,9 +516,12 @@ app.post('/api/budget-documents', async (req, res) => {
 });
 
 app.put('/api/budget-documents/:id', async (req, res) => {
-  const allowedFields = ['vendorId', 'title', 'type', 'status', 'amount', 'documentUrl', 'fileName', 'notes', 'declinedReason', 'requestedAt', 'receivedAt'];
+  const allowedFields = ['vendorId', 'paymentId', 'title', 'type', 'status', 'amount', 'documentUrl', 'fileName', 'notes', 'declinedReason', 'isVerified', 'verifiedAt', 'verifiedBy', 'requestedAt', 'receivedAt'];
   const data = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowedFields.includes(key)));
   if ('amount' in data) data.amount = data.amount === '' || data.amount == null ? null : Number(data.amount);
+  if ('isVerified' in data && data.isVerified && !data.verifiedAt) data.verifiedAt = new Date();
+  if ('isVerified' in data && !data.isVerified) data.verifiedAt = null;
+  if ('verifiedAt' in data) data.verifiedAt = data.verifiedAt ? new Date(data.verifiedAt) : null;
   if ('requestedAt' in data) data.requestedAt = data.requestedAt ? new Date(data.requestedAt) : null;
   if ('receivedAt' in data) data.receivedAt = data.receivedAt ? new Date(data.receivedAt) : null;
   const document = await prisma.budgetDocument.update({

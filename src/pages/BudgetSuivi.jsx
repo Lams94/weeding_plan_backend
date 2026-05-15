@@ -24,6 +24,19 @@ const tabs = [
 ];
 
 const typeLabel = (type) => documentTypes.find(([value]) => value === type)?.[1] || type;
+const requiredDocumentTypes = ['devis_propose', 'rib_prestataire', 'contrat', 'facture_acompte', 'facture_finale'];
+const contractStatuses = [
+  ['non_recu', 'Contrat non reçu'],
+  ['recu', 'Contrat reçu'],
+  ['signe', 'Contrat signé'],
+  ['archive', 'Contrat archivé']
+];
+const contractLabel = (status) => contractStatuses.find(([value]) => value === status)?.[1] || status || 'Contrat non reçu';
+const paymentStatusLabel = {
+  paid: 'Payé',
+  due: 'À payer',
+  overdue: 'En retard'
+};
 
 export default function BudgetSuivi() {
   const activeWedding = useStore(state => state.activeWedding);
@@ -41,6 +54,7 @@ export default function BudgetSuivi() {
   const [baseBudget, setBaseBudget] = useState(activeWedding?.baseBudget || 0);
   const [paymentForms, setPaymentForms] = useState({});
   const [documentModalVendor, setDocumentModalVendor] = useState(null);
+  const [vendorFilter, setVendorFilter] = useState('all');
   const [documentForm, setDocumentForm] = useState({
     title: '',
     vendorId: '',
@@ -50,11 +64,14 @@ export default function BudgetSuivi() {
     documentUrl: '',
     fileName: '',
     notes: '',
-    declinedReason: ''
+    declinedReason: '',
+    paymentId: ''
   });
 
-  const committed = vendors.reduce((sum, vendor) => sum + (Number(vendor.budget) || 0), 0);
-  const paid = vendors.reduce((sum, vendor) => sum + (Number(vendor.paid) || 0), 0);
+  const vendorRoles = useMemo(() => [...new Set(vendors.map(vendor => vendor.role).filter(Boolean))].sort(), [vendors]);
+  const filteredVendors = useMemo(() => vendorFilter === 'all' ? vendors : vendors.filter(vendor => vendor.role === vendorFilter), [vendors, vendorFilter]);
+  const committed = filteredVendors.reduce((sum, vendor) => sum + (Number(vendor.budget) || 0), 0);
+  const paid = filteredVendors.reduce((sum, vendor) => sum + (Number(vendor.paid) || 0), 0);
   const base = Number(baseBudget) || 0;
   const remaining = base - committed;
   const paidRate = committed > 0 ? Math.min(100, Math.round((paid / committed) * 100)) : 0;
@@ -64,6 +81,26 @@ export default function BudgetSuivi() {
     requests: budgetDocuments.filter(document => document.type === 'demande_devis' && document.status !== 'declined'),
     declined: budgetDocuments.filter(document => document.status === 'declined')
   }), [budgetDocuments]);
+
+  const upcomingPayments = useMemo(() => vendors.flatMap(vendor => (vendor.payments || []).map(payment => ({
+    ...payment,
+    vendorName: vendor.name,
+    effectiveStatus: payment.status === 'paid' ? 'paid' : (payment.dueDate && new Date(payment.dueDate) < new Date() ? 'overdue' : 'due')
+  }))).filter(payment => payment.status !== 'paid' || payment.dueDate).sort((a, b) => new Date(a.dueDate || a.paidAt) - new Date(b.dueDate || b.paidAt)), [vendors]);
+
+  const vendorHealth = (vendor) => {
+    const docs = budgetDocuments.filter(document => document.vendorId === vendor.id && document.status !== 'declined');
+    const docTypes = new Set(docs.map(document => document.type));
+    const missingDocuments = requiredDocumentTypes.filter(type => !docTypes.has(type));
+    const quotes = docs.filter(document => document.type === 'devis_propose' && document.amount != null);
+    const quoteAmount = quotes.length ? quotes[0].amount : null;
+    return {
+      docs,
+      missingDocuments,
+      quoteAmount,
+      variance: quoteAmount == null ? null : quoteAmount - (Number(vendor.budget) || 0)
+    };
+  };
 
   const updatePaymentForm = (vendorId, patch) => {
     setPaymentForms(prev => ({
@@ -80,9 +117,10 @@ export default function BudgetSuivi() {
       label: form.label || 'Paiement',
       amount: Number(form.amount),
       kind: form.kind || 'acompte',
-      status: 'paid'
+      status: form.status || 'paid',
+      dueDate: form.dueDate || null
     });
-    setPaymentForms(prev => ({ ...prev, [vendorId]: { label: 'Acompte', amount: '', kind: 'acompte' } }));
+    setPaymentForms(prev => ({ ...prev, [vendorId]: { label: 'Acompte', amount: '', kind: 'acompte', status: 'paid', dueDate: '' } }));
   };
 
   const submitDocument = async (event) => {
@@ -102,7 +140,8 @@ export default function BudgetSuivi() {
       documentUrl: '',
       fileName: '',
       notes: '',
-      declinedReason: ''
+      declinedReason: '',
+      paymentId: ''
     });
     setDocumentModalVendor(null);
   };
@@ -119,6 +158,7 @@ export default function BudgetSuivi() {
                 <h3 className="font-semibold text-on-surface">{document.title}</h3>
                 <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-[10px] uppercase tracking-widest">{typeLabel(document.type)}</span>
                 {document.status === 'declined' && <span className="px-2 py-1 rounded-full bg-error/10 text-error text-[10px] uppercase tracking-widest">décliné</span>}
+                {document.isVerified && <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-[10px] uppercase tracking-widest">vérifié</span>}
               </div>
               <p className="text-sm text-secondary">{document.vendor?.name || vendors.find(v => v.id === document.vendorId)?.name || 'Sans prestataire'}</p>
               {document.amount != null && <p className="text-sm text-on-surface mt-1">Montant: <strong>{euro.format(document.amount)}</strong></p>}
@@ -128,6 +168,9 @@ export default function BudgetSuivi() {
               {document.documentUrl && <a href={document.documentUrl} target="_blank" rel="noreferrer" className="inline-flex text-primary text-sm mt-2 hover:underline">Ouvrir le document</a>}
             </div>
             <div className="flex gap-2">
+              <button onClick={() => updateBudgetDocument(document.id, { isVerified: !document.isVerified, verifiedBy: document.isVerified ? null : 'Wedding planner' })} className="border border-outline-variant rounded-md px-3 py-2 text-sm text-on-surface-variant hover:text-primary">
+                {document.isVerified ? 'Dévalider' : 'Vérifier'}
+              </button>
               {document.status !== 'declined' && (
                 <button onClick={() => {
                   const reason = window.prompt('Motif du devis décliné :', document.declinedReason || '');
@@ -145,6 +188,33 @@ export default function BudgetSuivi() {
       ))}
     </div>
   );
+
+  const exportBudgetCsv = () => {
+    const rows = [
+      ['Prestataire', 'Role', 'Contrat', 'Budget', 'Paye', 'Reste', 'Documents manquants', 'Ecart devis'],
+      ...filteredVendors.map(vendor => {
+        const health = vendorHealth(vendor);
+        return [
+          vendor.name,
+          vendor.role,
+          contractLabel(vendor.contractStatus),
+          vendor.budget || 0,
+          vendor.paid || 0,
+          (vendor.budget || 0) - (vendor.paid || 0),
+          health.missingDocuments.map(typeLabel).join(' | '),
+          health.variance ?? ''
+        ];
+      })
+    ];
+    const csv = rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(';')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `budget-${activeWedding?.name || 'mariage'}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <>
@@ -196,6 +266,57 @@ export default function BudgetSuivi() {
           </div>
         </div>
 
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+          <div className="bg-surface border border-outline-variant rounded-xl p-5">
+            <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-3">Filtre poste</p>
+            <select value={vendorFilter} onChange={event => setVendorFilter(event.target.value)} className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface">
+              <option value="all">Tous les prestataires</option>
+              {vendorRoles.map(role => <option key={role} value={role}>{role}</option>)}
+            </select>
+          </div>
+          <div className="bg-surface border border-outline-variant rounded-xl p-5">
+            <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-3">Exports</p>
+            <div className="flex gap-2">
+              <button onClick={exportBudgetCsv} className="flex-1 border border-outline-variant rounded-md px-3 py-3 text-sm text-on-surface hover:border-primary">Excel CSV</button>
+              <button onClick={() => window.print()} className="flex-1 border border-outline-variant rounded-md px-3 py-3 text-sm text-on-surface hover:border-primary">PDF / Imprimer</button>
+            </div>
+          </div>
+          <div className="bg-surface border border-outline-variant rounded-xl p-5">
+            <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-3">Échéances</p>
+            <p className="text-sm text-on-surface-variant">{upcomingPayments.filter(payment => payment.effectiveStatus !== 'paid').length} paiement(s) à suivre</p>
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+          <div className="bg-surface border border-outline-variant rounded-xl p-5">
+            <h2 className="font-headline-sm text-headline-sm text-on-surface mb-4">Documents manquants</h2>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {filteredVendors.filter(vendor => vendorHealth(vendor).missingDocuments.length > 0).slice(0, 8).map(vendor => (
+                <div key={vendor.id} className="bg-surface-container-low rounded-lg p-3">
+                  <p className="font-semibold text-on-surface">{vendor.name}</p>
+                  <p className="text-xs text-error mt-1">{vendorHealth(vendor).missingDocuments.map(typeLabel).join(', ')}</p>
+                </div>
+              ))}
+              {filteredVendors.every(vendor => vendorHealth(vendor).missingDocuments.length === 0) && <p className="text-sm text-on-surface-variant">Tous les documents obligatoires sont présents.</p>}
+            </div>
+          </div>
+          <div className="bg-surface border border-outline-variant rounded-xl p-5">
+            <h2 className="font-headline-sm text-headline-sm text-on-surface mb-4">Échéances paiement</h2>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {upcomingPayments.slice(0, 8).map(payment => (
+                <div key={payment.id} className="bg-surface-container-low rounded-lg p-3 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-on-surface">{payment.vendorName}</p>
+                    <p className="text-xs text-secondary">{payment.label} · {payment.dueDate ? new Date(payment.dueDate).toLocaleDateString('fr-FR') : new Date(payment.paidAt).toLocaleDateString('fr-FR')}</p>
+                  </div>
+                  <span className={payment.effectiveStatus === 'overdue' ? 'text-error text-sm' : 'text-primary text-sm'}>{paymentStatusLabel[payment.effectiveStatus]}</span>
+                </div>
+              ))}
+              {upcomingPayments.length === 0 && <p className="text-sm text-on-surface-variant">Aucune échéance enregistrée.</p>}
+            </div>
+          </div>
+        </section>
+
         <nav className="flex gap-2 overflow-x-auto mb-6">
           {tabs.map(([value, label]) => (
             <button key={value} onClick={() => setActiveTab(value)} className={`px-4 py-3 rounded-full border text-sm uppercase tracking-widest whitespace-nowrap ${activeTab === value ? 'bg-primary text-on-primary border-primary' : 'bg-surface border-outline-variant text-on-surface-variant'}`}>
@@ -230,10 +351,11 @@ export default function BudgetSuivi() {
 
         {activeTab === 'payments' && (
           <section className="space-y-5">
-            {vendors.map(vendor => {
+            {filteredVendors.map(vendor => {
               const vendorPaidRate = vendor.budget > 0 ? Math.min(100, Math.round((vendor.paid / vendor.budget) * 100)) : 0;
               const form = paymentForms[vendor.id] || { label: 'Acompte', amount: '', kind: 'acompte' };
               const vendorDocuments = budgetDocuments.filter(document => document.vendorId === vendor.id);
+              const health = vendorHealth(vendor);
               return (
                 <article key={vendor.id} className="bg-surface border border-outline-variant rounded-xl p-5">
                   <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
@@ -244,6 +366,15 @@ export default function BudgetSuivi() {
                         <span>Devis: <strong>{euro.format(vendor.budget || 0)}</strong></span>
                         <span>Payé: <strong>{euro.format(vendor.paid || 0)}</strong></span>
                         <span>Reste: <strong>{euro.format((vendor.budget || 0) - (vendor.paid || 0))}</strong></span>
+                        {health.variance != null && <span>Écart devis réel: <strong className={health.variance > 0 ? 'text-error' : 'text-primary'}>{euro.format(health.variance)}</strong></span>}
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <select value={vendor.contractStatus || 'non_recu'} onChange={event => updateVendorFinancials(vendor.id, { contractStatus: event.target.value })} className="border border-outline-variant rounded-full px-3 py-2 bg-surface text-xs">
+                          {contractStatuses.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                        </select>
+                        {health.missingDocuments.slice(0, 3).map(type => (
+                          <span key={type} className="px-3 py-2 rounded-full bg-error/10 text-error text-[10px] uppercase tracking-widest">Manque {typeLabel(type)}</span>
+                        ))}
                       </div>
                     </div>
 
@@ -255,7 +386,7 @@ export default function BudgetSuivi() {
                         <span className="text-sm font-semibold text-primary w-12 text-right">{vendorPaidRate}%</span>
                       </div>
 
-                      <form onSubmit={(event) => submitPayment(event, vendor.id)} className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                      <form onSubmit={(event) => submitPayment(event, vendor.id)} className="grid grid-cols-1 sm:grid-cols-6 gap-2">
                         <input value={form.label} onChange={event => updatePaymentForm(vendor.id, { label: event.target.value })} className="border border-outline-variant rounded-md px-3 py-2 bg-surface sm:col-span-1" placeholder="Libellé" />
                         <select value={form.kind} onChange={event => updatePaymentForm(vendor.id, { kind: event.target.value })} className="border border-outline-variant rounded-md px-3 py-2 bg-surface">
                           <option value="acompte">Acompte</option>
@@ -263,6 +394,11 @@ export default function BudgetSuivi() {
                           <option value="solde">Solde</option>
                         </select>
                         <input type="number" min="0" step="0.01" value={form.amount} onChange={event => updatePaymentForm(vendor.id, { amount: event.target.value })} className="border border-outline-variant rounded-md px-3 py-2 bg-surface" placeholder="Montant" />
+                        <select value={form.status || 'paid'} onChange={event => updatePaymentForm(vendor.id, { status: event.target.value })} className="border border-outline-variant rounded-md px-3 py-2 bg-surface">
+                          <option value="paid">Payé</option>
+                          <option value="due">À payer</option>
+                        </select>
+                        <input type="date" value={form.dueDate || ''} onChange={event => updatePaymentForm(vendor.id, { dueDate: event.target.value })} className="border border-outline-variant rounded-md px-3 py-2 bg-surface" />
                         <button className="bg-primary text-on-primary rounded-md px-3 py-2 font-label-sm uppercase tracking-widest">Ajouter</button>
                       </form>
                     </div>
@@ -286,9 +422,13 @@ export default function BudgetSuivi() {
                           <div key={payment.id} className="flex items-center justify-between gap-3 bg-surface-container-low rounded-md px-3 py-2">
                             <div>
                               <p className="font-medium text-on-surface">{payment.label} <span className="text-xs text-secondary uppercase">({payment.kind})</span></p>
-                              <p className="text-xs text-secondary">{new Date(payment.paidAt).toLocaleDateString('fr-FR')}</p>
+                              <p className="text-xs text-secondary">
+                                {payment.status === 'paid' ? 'Payé le ' : 'Échéance '}
+                                {new Date(payment.dueDate || payment.paidAt).toLocaleDateString('fr-FR')}
+                              </p>
                             </div>
                             <div className="flex items-center gap-3">
+                              <span className={payment.status === 'paid' ? 'text-primary text-xs uppercase' : 'text-error text-xs uppercase'}>{paymentStatusLabel[payment.status] || payment.status}</span>
                               <span className="font-semibold">{euro.format(payment.amount)}</span>
                               <button onClick={() => deleteVendorPayment(payment.id)} className="text-error hover:opacity-70">
                                 <span className="material-symbols-outlined text-[18px]">delete</span>
@@ -318,7 +458,8 @@ export default function BudgetSuivi() {
                           documentUrl: '',
                           fileName: '',
                           notes: '',
-                          declinedReason: ''
+                          declinedReason: '',
+                          paymentId: ''
                         });
                       }}
                       className="inline-flex items-center justify-center gap-2 bg-primary text-on-primary rounded-full px-5 py-3 font-label-sm uppercase tracking-widest hover:bg-primary/90 transition-colors"
@@ -337,6 +478,7 @@ export default function BudgetSuivi() {
                               <div className="flex flex-wrap items-center gap-2 mb-1">
                                 <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-[10px] uppercase tracking-widest">{typeLabel(document.type)}</span>
                                 {document.status === 'declined' && <span className="px-2 py-1 rounded-full bg-error/10 text-error text-[10px] uppercase tracking-widest">décliné</span>}
+                                {document.isVerified && <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-[10px] uppercase tracking-widest">vérifié</span>}
                               </div>
                               <p className="font-medium text-on-surface truncate">{document.title}</p>
                               <p className="text-xs text-secondary mt-1">
@@ -402,6 +544,15 @@ export default function BudgetSuivi() {
               <label className="block">
                 <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Montant</span>
                 <input type="number" min="0" step="0.01" value={documentForm.amount} onChange={event => setDocumentForm({ ...documentForm, amount: event.target.value })} className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface" placeholder="Ex: 1250" />
+              </label>
+              <label className="block md:col-span-2">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Lier à une opération de paiement</span>
+                <select value={documentForm.paymentId || ''} onChange={event => setDocumentForm({ ...documentForm, paymentId: event.target.value })} className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface">
+                  <option value="">Aucune opération précise</option>
+                  {(documentModalVendor.payments || []).map(payment => (
+                    <option key={payment.id} value={payment.id}>{payment.label} - {euro.format(payment.amount)} - {new Date(payment.dueDate || payment.paidAt).toLocaleDateString('fr-FR')}</option>
+                  ))}
+                </select>
               </label>
               <label className="block md:col-span-2">
                 <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Titre</span>
