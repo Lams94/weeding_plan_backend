@@ -10,6 +10,8 @@ const socket = io(API_BASE_URL || (window.location.hostname === 'localhost' ? 'h
 });
 
 const LOCAL_STATE_KEY = 'weddingPlan.localState.v1';
+const ACCESS_ROLE_KEY = 'weddingPlan.currentAccessRole.v1';
+const GUEST_GROUP_KEY = 'weddingPlan.currentGuestGroup.v1';
 
 const makeId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -44,7 +46,8 @@ const defaultLocalState = () => {
         guests: [],
         tables: [],
         vendors: [],
-        tracks: []
+        tracks: [],
+        thoughts: []
       }
     }
   };
@@ -76,7 +79,8 @@ const readLocalProject = (weddingId) => {
     guests: [],
     tables: [],
     vendors: [],
-    tracks: []
+    tracks: [],
+    thoughts: []
   };
 };
 
@@ -114,6 +118,16 @@ const useStore = create((set, get) => ({
   // --- DATA ---
   weddings: [],
   activeWedding: null, // Le projet actuellement sélectionné
+  currentAccessRole: typeof window !== 'undefined' ? window.localStorage.getItem(ACCESS_ROLE_KEY) || 'super_user' : 'super_user',
+  currentGuestGroup: typeof window !== 'undefined' ? window.localStorage.getItem(GUEST_GROUP_KEY) || 'famille' : 'famille',
+  setCurrentAccessRole: (role) => {
+    if (typeof window !== 'undefined') window.localStorage.setItem(ACCESS_ROLE_KEY, role);
+    set({ currentAccessRole: role });
+  },
+  setCurrentGuestGroup: (group) => {
+    if (typeof window !== 'undefined') window.localStorage.setItem(GUEST_GROUP_KEY, group);
+    set({ currentGuestGroup: group });
+  },
 
   agendaItems: [],
   messages: [],
@@ -121,6 +135,7 @@ const useStore = create((set, get) => ({
   tables: [],
   vendors: [],
   tracks: [], // DJ Live Deck
+  thoughts: [],
   isLoading: false, // Global Loading state
 
   // --- TELEMETRY / LOGS ---
@@ -204,7 +219,8 @@ const useStore = create((set, get) => ({
         guests: [],
         tables: [],
         vendors: [],
-        tracks: []
+        tracks: [],
+        thoughts: []
       };
       writeLocalState(localState);
       set(state => ({ weddings: [newWedding, ...state.weddings] }));
@@ -253,13 +269,14 @@ const useStore = create((set, get) => ({
     const headers = { 'x-wedding-id': activeWedding.id };
 
     try {
-      const [agendaRes, messagesRes, guestsRes, tablesRes, vendorsRes, tracksRes] = await Promise.all([
+      const [agendaRes, messagesRes, guestsRes, tablesRes, vendorsRes, tracksRes, thoughtsRes] = await Promise.all([
         apiFetch('/api/agenda', { headers }),
         apiFetch('/api/messages', { headers }),
         apiFetch('/api/guests', { headers }),
         apiFetch('/api/tables', { headers }),
         apiFetch('/api/vendors', { headers }),
-        apiFetch('/api/tracks', { headers })
+        apiFetch('/api/tracks', { headers }),
+        apiFetch('/api/thoughts', { headers })
       ]);
       if (![agendaRes, messagesRes, guestsRes, tablesRes, vendorsRes, tracksRes].every(res => res.ok)) {
         throw new Error('Project API unavailable');
@@ -270,7 +287,8 @@ const useStore = create((set, get) => ({
         guests: await guestsRes.json(),
         tables: await tablesRes.json(),
         vendors: await vendorsRes.json(),
-        tracks: await tracksRes.json()
+        tracks: await tracksRes.json(),
+        thoughts: thoughtsRes.ok ? await thoughtsRes.json() : []
       });
       
       get().setupSocketListeners();
@@ -445,6 +463,33 @@ const useStore = create((set, get) => ({
     } finally {
       set({ isLoading: false });
     }
+  },
+
+  addThought: async (thoughtData) => {
+    if (!get().activeWedding) return null;
+    let thought;
+    try {
+      const res = await apiFetch('/api/thoughts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-wedding-id': get().activeWedding.id },
+        body: JSON.stringify(thoughtData)
+      });
+      if (!res.ok) throw new Error('Thought creation failed');
+      thought = await res.json();
+    } catch (e) {
+      thought = {
+        id: makeId('local-thought'),
+        title: thoughtData.title || 'Nouvelle pensée',
+        content: thoughtData.content || '',
+        imageUrl: thoughtData.imageUrl || '',
+        sharedWithPlanner: Boolean(thoughtData.sharedWithPlanner),
+        weddingId: get().activeWedding.id,
+        createdAt: new Date().toISOString()
+      };
+    }
+    set(state => ({ thoughts: [thought, ...state.thoughts] }));
+    get().showToast('Pensée enregistrée');
+    return thought;
   },
 
   addGuest: async (guest) => {

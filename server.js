@@ -96,7 +96,9 @@ app.get('/api/weddings', async (req, res) => {
       include: {
         agenda: { orderBy: { time: 'asc' } },
         vendors: true,
-        guests: true
+        guests: true,
+        thoughts: true,
+        accessProfiles: true
       }
     });
     res.json(weddings);
@@ -123,6 +125,14 @@ app.post('/api/weddings', async (req, res) => {
         beneficiaries: req.body.beneficiaries || null,
         baseBudget: Number(req.body.baseBudget) || 0,
         onboardingComplete: Boolean(req.body.onboardingComplete),
+        plannerAccessEnabled: Boolean(req.body.plannerAccessEnabled),
+        plannerDelegationMode: req.body.plannerDelegationMode || 'none',
+        plannerCanSeePrivateThoughts: Boolean(req.body.plannerCanSeePrivateThoughts),
+        plannerCanSeeCoupleDirectMessages: Boolean(req.body.plannerCanSeeCoupleDirectMessages),
+        vendorDelegationMode: req.body.vendorDelegationMode || 'couple',
+        venueAddress: req.body.venueAddress || null,
+        venueAccessTime: req.body.venueAccessTime || null,
+        vendorInstructions: req.body.vendorInstructions || null,
         agenda: {
           create: defaultPlanningTasks.map(([time, title, description], index) => ({
             time,
@@ -145,7 +155,9 @@ app.post('/api/weddings', async (req, res) => {
         agenda: { orderBy: { orderIndex: 'asc' } },
         vendors: true,
         guests: true,
-        tables: true
+        tables: true,
+        thoughts: true,
+        accessProfiles: true
       }
     });
     res.json(wedding);
@@ -166,7 +178,15 @@ app.put('/api/weddings/:id', async (req, res) => {
     'plannerName',
     'beneficiaries',
     'baseBudget',
-    'onboardingComplete'
+    'onboardingComplete',
+    'plannerAccessEnabled',
+    'plannerDelegationMode',
+    'plannerCanSeePrivateThoughts',
+    'plannerCanSeeCoupleDirectMessages',
+    'vendorDelegationMode',
+    'venueAddress',
+    'venueAccessTime',
+    'vendorInstructions'
   ];
   const data = Object.fromEntries(
     Object.entries(req.body).filter(([key]) => allowedFields.includes(key))
@@ -203,9 +223,37 @@ app.get('/api/guests', async (req, res) => {
   res.json(guests);
 });
 
+// --- PRIVATE COUPLE THOUGHTS ---
+app.get('/api/thoughts', async (req, res) => {
+  const thoughts = await prisma.weddingThought.findMany({
+    where: { weddingId: req.weddingId },
+    orderBy: { createdAt: 'desc' }
+  });
+  res.json(thoughts);
+});
+
+app.post('/api/thoughts', async (req, res) => {
+  const thought = await prisma.weddingThought.create({
+    data: {
+      weddingId: req.weddingId,
+      title: req.body.title || 'Nouvelle pensée',
+      content: req.body.content || '',
+      imageUrl: req.body.imageUrl || null,
+      sharedWithPlanner: Boolean(req.body.sharedWithPlanner)
+    }
+  });
+  res.json(thought);
+});
+
 app.post('/api/guests', async (req, res) => {
   const { weddingId, ...guestData } = req.body;
-  const guest = await prisma.guest.create({ data: { ...guestData, weddingId: req.weddingId } });
+  const guest = await prisma.guest.create({
+    data: {
+      ...guestData,
+      calendarGroup: req.body.calendarGroup || req.body.groupName || req.body.circle || null,
+      weddingId: req.weddingId
+    }
+  });
   io.emit('guestCreated', guest); // Notification temps réel
   res.json(guest);
 });
@@ -248,6 +296,9 @@ app.post('/api/agenda', async (req, res) => {
       isRestricted: Boolean(req.body.isRestricted),
       isDone: Boolean(req.body.isDone),
       orderIndex: Number(req.body.orderIndex) || 0,
+      audience: req.body.audience || 'all',
+      guestGroup: req.body.guestGroup || null,
+      vendorRole: req.body.vendorRole || null,
       weddingId: req.weddingId
     }
   });
@@ -275,7 +326,15 @@ app.get('/api/messages', async (req, res) => {
 
 app.post('/api/messages', async (req, res) => {
   const { weddingId, ...msgData } = req.body;
-  const message = await prisma.message.create({ data: { ...msgData, weddingId: req.weddingId } });
+  const message = await prisma.message.create({
+    data: {
+      ...msgData,
+      channel: req.body.channel || 'backstage',
+      audience: req.body.audience || 'planner',
+      isPrivate: Boolean(req.body.isPrivate),
+      weddingId: req.weddingId
+    }
+  });
   io.emit('messageCreated', message); // Notification temps réel
   res.json(message);
 });
@@ -316,7 +375,19 @@ app.get('/api/vendors', async (req, res) => {
 
 app.post('/api/vendors', async (req, res) => {
   const { weddingId, ...vendorData } = req.body;
-  const vendor = await prisma.vendor.create({ data: { ...vendorData, weddingId: req.weddingId } });
+  const vendor = await prisma.vendor.create({
+    data: {
+      ...vendorData,
+      accessRole: req.body.accessRole || req.body.role || null,
+      accessEnabled: Boolean(req.body.accessEnabled),
+      canMessageCouple: Boolean(req.body.canMessageCouple),
+      canMessagePlanner: req.body.canMessagePlanner !== false,
+      canSeeGuestList: Boolean(req.body.canSeeGuestList),
+      canSeeFloorPlan: Boolean(req.body.canSeeFloorPlan || String(req.body.role || '').toLowerCase().includes('dj')),
+      canSeeMusicStudio: Boolean(req.body.canSeeMusicStudio || String(req.body.role || '').toLowerCase().includes('dj')),
+      weddingId: req.weddingId
+    }
+  });
   res.json(vendor);
 });
 

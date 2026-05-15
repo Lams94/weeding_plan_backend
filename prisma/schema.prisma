@@ -20,6 +20,14 @@ model Wedding {
   beneficiaries      String?
   baseBudget         Float           @default(0)
   onboardingComplete Boolean         @default(false)
+  plannerAccessEnabled Boolean       @default(false)
+  plannerDelegationMode String       @default("none")
+  plannerCanSeePrivateThoughts Boolean @default(false)
+  plannerCanSeeCoupleDirectMessages Boolean @default(false)
+  vendorDelegationMode String        @default("couple")
+  venueAddress       String?
+  venueAccessTime    String?
+  vendorInstructions String?
   guests             Guest[]
   tables             Table[]
   agenda             AgendaItem[]
@@ -27,6 +35,8 @@ model Wedding {
   vendors            Vendor[]
   tracks             Track[]
   vendorPayments     VendorPayment[]
+  thoughts           WeddingThought[]
+  accessProfiles     ProjectAccess[]
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @default(now()) @updatedAt
 }
@@ -39,6 +49,7 @@ model Guest {
   agendaVis Boolean  @default(false)
   diet      Boolean  @default(false)
   groupName String?
+  calendarGroup String?
   email     String?
   tableId   String?
   table     Table?   @relation(fields: [tableId], references: [id])
@@ -69,6 +80,9 @@ model AgendaItem {
   isDone       Boolean  @default(false)
   image        String?
   orderIndex   Int      @default(0)
+  audience     String   @default("all")
+  guestGroup   String?
+  vendorRole   String?
   weddingId    String?
   wedding      Wedding? @relation(fields: [weddingId], references: [id])
 }
@@ -80,6 +94,11 @@ model Message {
   text        String
   isImportant Boolean  @default(false)
   senderColor String   @default("primary")
+  channel     String   @default("backstage")
+  audience    String   @default("planner")
+  vendorId    String?
+  guestId     String?
+  isPrivate   Boolean  @default(false)
   weddingId   String?
   wedding     Wedding? @relation(fields: [weddingId], references: [id])
   createdAt   DateTime @default(now())
@@ -94,9 +113,46 @@ model Vendor {
   paid       Float           @default(0)
   phone      String?
   isCritical Boolean         @default(false)
+  accessRole String?
+  accessEnabled Boolean      @default(false)
+  canMessageCouple Boolean   @default(false)
+  canMessagePlanner Boolean  @default(true)
+  canSeeGuestList Boolean    @default(false)
+  canSeeFloorPlan Boolean    @default(false)
+  canSeeMusicStudio Boolean  @default(false)
+  missionNotes String?
+  arrivalTime String?
+  locationNotes String?
   weddingId  String?
   wedding    Wedding?        @relation(fields: [weddingId], references: [id])
   payments   VendorPayment[]
+}
+
+model WeddingThought {
+  id                 String   @id @default(uuid())
+  title              String
+  content            String?
+  imageUrl           String?
+  sharedWithPlanner  Boolean  @default(false)
+  weddingId          String
+  wedding            Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model ProjectAccess {
+  id          String   @id @default(uuid())
+  role        String
+  displayName String?
+  email       String?
+  vendorId    String?
+  guestId     String?
+  permissions Json?
+  isSuperUser Boolean  @default(false)
+  weddingId   String
+  wedding     Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Track {
