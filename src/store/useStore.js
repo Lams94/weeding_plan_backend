@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { io } from 'socket.io-client';
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const DEFAULT_API_BASE_URL = 'https://weedingplanbackend-production.up.railway.app';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, '');
 const apiFetch = (path, options) => fetch(`${API_BASE_URL}${path}`, options);
 
 // Initialisation de la connexion Socket.io vers le serveur distant si configuré.
-const socket = io(API_BASE_URL || (window.location.hostname === 'localhost' ? 'http://localhost:3001' : '/'), {
-  autoConnect: Boolean(API_BASE_URL || window.location.hostname === 'localhost')
+const socket = io(API_BASE_URL, {
+  autoConnect: Boolean(API_BASE_URL)
 });
 
 const LOCAL_STATE_KEY = 'weddingPlan.localState.v1';
@@ -141,6 +142,9 @@ const useStore = create((set, get) => ({
 
   // --- TELEMETRY / LOGS ---
   sendReport: async (level, message, context = {}) => {
+    const isLocalBrowser = typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname);
+    if (isLocalBrowser && !import.meta.env.VITE_ENABLE_TELEMETRY) return;
+
     try {
       await fetch('https://devdashapklink-production.up.railway.app/logs', {
         method: 'POST',
