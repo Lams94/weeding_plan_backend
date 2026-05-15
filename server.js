@@ -95,10 +95,11 @@ app.get('/api/weddings', async (req, res) => {
       orderBy: { createdAt: 'desc' },
       include: {
         agenda: { orderBy: { time: 'asc' } },
-        vendors: true,
+        vendors: { include: { payments: { orderBy: { paidAt: 'desc' } }, documents: { orderBy: { createdAt: 'desc' } } } },
         guests: true,
         thoughts: true,
-        accessProfiles: true
+        accessProfiles: true,
+        budgetDocuments: { orderBy: { createdAt: 'desc' } }
       }
     });
     res.json(weddings);
@@ -153,11 +154,12 @@ app.post('/api/weddings', async (req, res) => {
       },
       include: {
         agenda: { orderBy: { orderIndex: 'asc' } },
-        vendors: true,
+        vendors: { include: { payments: { orderBy: { paidAt: 'desc' } }, documents: { orderBy: { createdAt: 'desc' } } } },
         guests: true,
         tables: true,
         thoughts: true,
-        accessProfiles: true
+        accessProfiles: true,
+        budgetDocuments: { orderBy: { createdAt: 'desc' } }
       }
     });
     res.json(wedding);
@@ -408,7 +410,10 @@ app.put('/api/tracks/:id', async (req, res) => {
 app.get('/api/vendors', async (req, res) => {
   const vendors = await prisma.vendor.findMany({
     where: { weddingId: req.weddingId },
-    include: { payments: { orderBy: { paidAt: 'desc' } } }
+    include: {
+      payments: { orderBy: { paidAt: 'desc' } },
+      documents: { orderBy: { createdAt: 'desc' } }
+    }
   });
   res.json(vendors);
 });
@@ -435,7 +440,10 @@ app.put('/api/vendors/:id', async (req, res) => {
   const vendor = await prisma.vendor.update({
     where: { id: req.params.id },
     data: req.body,
-    include: { payments: { orderBy: { paidAt: 'desc' } } }
+    include: {
+      payments: { orderBy: { paidAt: 'desc' } },
+      documents: { orderBy: { createdAt: 'desc' } }
+    }
   });
   res.json(vendor);
 });
@@ -462,11 +470,64 @@ app.post('/api/vendors/:id/payments', async (req, res) => {
   const vendor = await prisma.vendor.update({
     where: { id: req.params.id },
     data: { paid: aggregate._sum.amount || 0 },
-    include: { payments: { orderBy: { paidAt: 'desc' } } }
+    include: {
+      payments: { orderBy: { paidAt: 'desc' } },
+      documents: { orderBy: { createdAt: 'desc' } }
+    }
   });
 
   io.emit('vendorPaymentCreated', { payment, vendor });
   res.json({ payment, vendor });
+});
+
+// --- BUDGET DOCUMENTS / QUOTES ---
+app.get('/api/budget-documents', async (req, res) => {
+  const documents = await prisma.budgetDocument.findMany({
+    where: { weddingId: req.weddingId },
+    include: { vendor: true },
+    orderBy: { createdAt: 'desc' }
+  });
+  res.json(documents);
+});
+
+app.post('/api/budget-documents', async (req, res) => {
+  const document = await prisma.budgetDocument.create({
+    data: {
+      weddingId: req.weddingId,
+      vendorId: req.body.vendorId || null,
+      title: req.body.title || 'Document budget',
+      type: req.body.type || 'devis_propose',
+      status: req.body.status || 'active',
+      amount: req.body.amount === '' || req.body.amount == null ? null : Number(req.body.amount),
+      documentUrl: req.body.documentUrl || null,
+      fileName: req.body.fileName || null,
+      notes: req.body.notes || null,
+      declinedReason: req.body.declinedReason || null,
+      requestedAt: req.body.requestedAt ? new Date(req.body.requestedAt) : null,
+      receivedAt: req.body.receivedAt ? new Date(req.body.receivedAt) : null
+    },
+    include: { vendor: true }
+  });
+  res.json(document);
+});
+
+app.put('/api/budget-documents/:id', async (req, res) => {
+  const allowedFields = ['vendorId', 'title', 'type', 'status', 'amount', 'documentUrl', 'fileName', 'notes', 'declinedReason', 'requestedAt', 'receivedAt'];
+  const data = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowedFields.includes(key)));
+  if ('amount' in data) data.amount = data.amount === '' || data.amount == null ? null : Number(data.amount);
+  if ('requestedAt' in data) data.requestedAt = data.requestedAt ? new Date(data.requestedAt) : null;
+  if ('receivedAt' in data) data.receivedAt = data.receivedAt ? new Date(data.receivedAt) : null;
+  const document = await prisma.budgetDocument.update({
+    where: { id: req.params.id },
+    data,
+    include: { vendor: true }
+  });
+  res.json(document);
+});
+
+app.delete('/api/budget-documents/:id', async (req, res) => {
+  await prisma.budgetDocument.delete({ where: { id: req.params.id } });
+  res.json({ ok: true });
 });
 
 app.delete('/api/vendor-payments/:id', async (req, res) => {
@@ -480,7 +541,10 @@ app.delete('/api/vendor-payments/:id', async (req, res) => {
   const vendor = await prisma.vendor.update({
     where: { id: payment.vendorId },
     data: { paid: aggregate._sum.amount || 0 },
-    include: { payments: { orderBy: { paidAt: 'desc' } } }
+    include: {
+      payments: { orderBy: { paidAt: 'desc' } },
+      documents: { orderBy: { createdAt: 'desc' } }
+    }
   });
 
   io.emit('vendorPaymentDeleted', { paymentId: req.params.id, vendor });

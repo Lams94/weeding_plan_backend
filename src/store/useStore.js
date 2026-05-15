@@ -138,6 +138,7 @@ const useStore = create((set, get) => ({
   tracks: [], // DJ Live Deck
   thoughts: [],
   accessProfiles: [],
+  budgetDocuments: [],
   isLoading: false, // Global Loading state
 
   // --- TELEMETRY / LOGS ---
@@ -274,7 +275,7 @@ const useStore = create((set, get) => ({
     const headers = { 'x-wedding-id': activeWedding.id };
 
     try {
-      const [agendaRes, messagesRes, guestsRes, tablesRes, vendorsRes, tracksRes, thoughtsRes, accessProfilesRes] = await Promise.all([
+      const [agendaRes, messagesRes, guestsRes, tablesRes, vendorsRes, tracksRes, thoughtsRes, accessProfilesRes, budgetDocumentsRes] = await Promise.all([
         apiFetch('/api/agenda', { headers }),
         apiFetch('/api/messages', { headers }),
         apiFetch('/api/guests', { headers }),
@@ -282,7 +283,8 @@ const useStore = create((set, get) => ({
         apiFetch('/api/vendors', { headers }),
         apiFetch('/api/tracks', { headers }),
         apiFetch('/api/thoughts', { headers }),
-        apiFetch('/api/access-profiles', { headers })
+        apiFetch('/api/access-profiles', { headers }),
+        apiFetch('/api/budget-documents', { headers })
       ]);
       if (![agendaRes, messagesRes, guestsRes, tablesRes, vendorsRes, tracksRes].every(res => res.ok)) {
         throw new Error('Project API unavailable');
@@ -295,7 +297,8 @@ const useStore = create((set, get) => ({
         vendors: await vendorsRes.json(),
         tracks: await tracksRes.json(),
         thoughts: thoughtsRes.ok ? await thoughtsRes.json() : [],
-        accessProfiles: accessProfilesRes.ok ? await accessProfilesRes.json() : []
+        accessProfiles: accessProfilesRes.ok ? await accessProfilesRes.json() : [],
+        budgetDocuments: budgetDocumentsRes.ok ? await budgetDocumentsRes.json() : []
       });
       
       get().setupSocketListeners();
@@ -742,6 +745,53 @@ const useStore = create((set, get) => ({
     } finally {
       set({ isLoading: false });
     }
+  },
+
+  addBudgetDocument: async (documentData) => {
+    if (!get().activeWedding) return null;
+    set({ isLoading: true });
+    try {
+      const res = await apiFetch('/api/budget-documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-wedding-id': get().activeWedding.id },
+        body: JSON.stringify(documentData)
+      });
+      if (!res.ok) throw new Error('Document creation failed');
+      const document = await res.json();
+      set(state => ({ budgetDocuments: [document, ...state.budgetDocuments] }));
+      get().showToast('Document ajouté');
+      return document;
+    } catch (e) {
+      get().showToast('Erreur document', 'error');
+      return null;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  updateBudgetDocument: async (id, data) => {
+    if (!get().activeWedding) return null;
+    set(state => ({ budgetDocuments: state.budgetDocuments.map(document => document.id === id ? { ...document, ...data } : document) }));
+    const res = await apiFetch(`/api/budget-documents/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'x-wedding-id': get().activeWedding.id },
+      body: JSON.stringify(data)
+    });
+    if (res.ok) {
+      const document = await res.json();
+      set(state => ({ budgetDocuments: state.budgetDocuments.map(item => item.id === id ? document : item) }));
+      return document;
+    }
+    return null;
+  },
+
+  deleteBudgetDocument: async (id) => {
+    if (!get().activeWedding) return;
+    set({ budgetDocuments: get().budgetDocuments.filter(document => document.id !== id) });
+    await apiFetch(`/api/budget-documents/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-wedding-id': get().activeWedding.id }
+    });
   }
 }));
 
