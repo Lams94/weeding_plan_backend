@@ -2,7 +2,14 @@ import React, { useEffect, useState } from 'react';
 import useStore from '../store/useStore';
 import { ROLES, roleLabels } from '../lib/accessControl';
 
-const roleOptions = [ROLES.SUPER_USER, ROLES.COUPLE, ROLES.WEDDING_PLANNER, ROLES.BENEFICIARY];
+const roleOptions = [
+  ROLES.SUPER_USER,
+  ROLES.COUPLE,
+  ROLES.WEDDING_PLANNER,
+  ROLES.VENDOR,
+  ROLES.GUEST,
+  ROLES.BENEFICIARY
+];
 
 export default function AgencyDashboard() {
   const weddings = useStore(state => state.weddings);
