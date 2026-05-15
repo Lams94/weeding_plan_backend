@@ -32,6 +32,7 @@ import TodoPlanning from './pages/TodoPlanning.jsx';
 import PrivateThoughts from './pages/PrivateThoughts.jsx';
 import VendorPortal from './pages/VendorPortal.jsx';
 import GuestCalendar from './pages/GuestCalendar.jsx';
+import AccessSettings from './pages/AccessSettings.jsx';
 import { canAccessRoute, visibleNavigation, roleLabels } from './lib/accessControl';
 
 function GuardedRoute({ path, children }) {
@@ -155,6 +156,7 @@ export default function App() {
             <Route path="/chat" element={<GuardedRoute path="/chat"><MessagerieBackstageLinenPure /></GuardedRoute>} />
             <Route path="/chat-live" element={<GuardedRoute path="/chat-live"><MessagerieBackstageCoordinationLive /></GuardedRoute>} />
             <Route path="/private-thoughts" element={<GuardedRoute path="/private-thoughts"><PrivateThoughts /></GuardedRoute>} />
+            <Route path="/access" element={<GuardedRoute path="/access"><AccessSettings /></GuardedRoute>} />
             <Route path="/canva" element={<GuardedRoute path="/canva"><CanvaEditorLinenPureEdition /></GuardedRoute>} />
             <Route path="/design" element={<DesignHubLinenPureEdition />} />
             <Route path="/music" element={<GuardedRoute path="/music"><MusicStudioLinenPure /></GuardedRoute>} />

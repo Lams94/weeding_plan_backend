@@ -136,6 +136,7 @@ const useStore = create((set, get) => ({
   vendors: [],
   tracks: [], // DJ Live Deck
   thoughts: [],
+  accessProfiles: [],
   isLoading: false, // Global Loading state
 
   // --- TELEMETRY / LOGS ---
@@ -269,14 +270,15 @@ const useStore = create((set, get) => ({
     const headers = { 'x-wedding-id': activeWedding.id };
 
     try {
-      const [agendaRes, messagesRes, guestsRes, tablesRes, vendorsRes, tracksRes, thoughtsRes] = await Promise.all([
+      const [agendaRes, messagesRes, guestsRes, tablesRes, vendorsRes, tracksRes, thoughtsRes, accessProfilesRes] = await Promise.all([
         apiFetch('/api/agenda', { headers }),
         apiFetch('/api/messages', { headers }),
         apiFetch('/api/guests', { headers }),
         apiFetch('/api/tables', { headers }),
         apiFetch('/api/vendors', { headers }),
         apiFetch('/api/tracks', { headers }),
-        apiFetch('/api/thoughts', { headers })
+        apiFetch('/api/thoughts', { headers }),
+        apiFetch('/api/access-profiles', { headers })
       ]);
       if (![agendaRes, messagesRes, guestsRes, tablesRes, vendorsRes, tracksRes].every(res => res.ok)) {
         throw new Error('Project API unavailable');
@@ -288,7 +290,8 @@ const useStore = create((set, get) => ({
         tables: await tablesRes.json(),
         vendors: await vendorsRes.json(),
         tracks: await tracksRes.json(),
-        thoughts: thoughtsRes.ok ? await thoughtsRes.json() : []
+        thoughts: thoughtsRes.ok ? await thoughtsRes.json() : [],
+        accessProfiles: accessProfilesRes.ok ? await accessProfilesRes.json() : []
       });
       
       get().setupSocketListeners();
@@ -442,7 +445,7 @@ const useStore = create((set, get) => ({
     }
   },
 
-  addMessage: async (text) => {
+  addMessage: async (text, meta = {}) => {
     if (!get().activeWedding) return;
     set({ isLoading: true });
     try {
@@ -454,7 +457,12 @@ const useStore = create((set, get) => ({
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           text: `"${text}"`,
           isImportant: false,
-          senderColor: 'primary'
+          senderColor: 'primary',
+          channel: meta.channel || 'backstage',
+          audience: meta.audience || 'planner',
+          vendorId: meta.vendorId || null,
+          guestId: meta.guestId || null,
+          isPrivate: Boolean(meta.isPrivate)
         })
       });
       const newMsg = await res.json();
@@ -490,6 +498,42 @@ const useStore = create((set, get) => ({
     set(state => ({ thoughts: [thought, ...state.thoughts] }));
     get().showToast('Pensée enregistrée');
     return thought;
+  },
+
+  addAccessProfile: async (profileData) => {
+    if (!get().activeWedding) return null;
+    try {
+      const res = await apiFetch('/api/access-profiles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-wedding-id': get().activeWedding.id },
+        body: JSON.stringify(profileData)
+      });
+      if (!res.ok) throw new Error('Access profile creation failed');
+      const profile = await res.json();
+      set(state => ({ accessProfiles: [profile, ...state.accessProfiles] }));
+      get().showToast('Accès créé');
+      return profile;
+    } catch (e) {
+      get().sendReport('ERROR', `Access profile failed: ${e.message}`, profileData);
+      get().showToast('Erreur accès', 'error');
+      return null;
+    }
+  },
+
+  updateAccessProfile: async (id, data) => {
+    if (!get().activeWedding) return null;
+    set(state => ({ accessProfiles: state.accessProfiles.map(profile => profile.id === id ? { ...profile, ...data } : profile) }));
+    const res = await apiFetch(`/api/access-profiles/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'x-wedding-id': get().activeWedding.id },
+      body: JSON.stringify(data)
+    });
+    if (res.ok) {
+      const profile = await res.json();
+      set(state => ({ accessProfiles: state.accessProfiles.map(item => item.id === id ? profile : item) }));
+      return profile;
+    }
+    return null;
   },
 
   addGuest: async (guest) => {

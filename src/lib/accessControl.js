@@ -29,6 +29,7 @@ const routeAccess = {
   '/chat': [ROLES.SUPER_USER, ROLES.COUPLE, ROLES.WEDDING_PLANNER, ROLES.VENDOR],
   '/chat-live': [ROLES.SUPER_USER, ROLES.COUPLE, ROLES.WEDDING_PLANNER, ROLES.VENDOR],
   '/private-thoughts': [ROLES.SUPER_USER, ROLES.COUPLE, ROLES.WEDDING_PLANNER],
+  '/access': [ROLES.SUPER_USER, ROLES.COUPLE, ROLES.WEDDING_PLANNER],
   '/vendor-portal': [ROLES.SUPER_USER, ROLES.VENDOR, ROLES.WEDDING_PLANNER],
   '/guest-calendar': [ROLES.SUPER_USER, ROLES.GUEST, ROLES.COUPLE, ROLES.WEDDING_PLANNER],
   '/hub-invit-prestige': [ROLES.SUPER_USER, ROLES.GUEST, ROLES.COUPLE, ROLES.WEDDING_PLANNER],
@@ -45,6 +46,7 @@ export const navigationSections = [
       { to: '/', label: 'Dashboard Cockpit', icon: 'dashboard' },
       { to: '/planning', label: 'Todo & Planning', icon: 'checklist' },
       { to: '/private-thoughts', label: 'Pensées mariés', icon: 'auto_stories' },
+      { to: '/access', label: 'Accès & délégations', icon: 'admin_panel_settings' },
       { to: '/budget', label: 'Budget & Paiements', icon: 'payments' }
     ]
   },

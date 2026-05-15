@@ -245,6 +245,41 @@ app.post('/api/thoughts', async (req, res) => {
   res.json(thought);
 });
 
+// --- ACCESS PROFILES ---
+app.get('/api/access-profiles', async (req, res) => {
+  const profiles = await prisma.projectAccess.findMany({
+    where: { weddingId: req.weddingId },
+    orderBy: { createdAt: 'desc' }
+  });
+  res.json(profiles);
+});
+
+app.post('/api/access-profiles', async (req, res) => {
+  const profile = await prisma.projectAccess.create({
+    data: {
+      weddingId: req.weddingId,
+      role: req.body.role || 'guest',
+      displayName: req.body.displayName || null,
+      email: req.body.email || null,
+      vendorId: req.body.vendorId || null,
+      guestId: req.body.guestId || null,
+      isSuperUser: Boolean(req.body.isSuperUser),
+      permissions: req.body.permissions || {}
+    }
+  });
+  res.json(profile);
+});
+
+app.put('/api/access-profiles/:id', async (req, res) => {
+  const allowedFields = ['role', 'displayName', 'email', 'vendorId', 'guestId', 'isSuperUser', 'permissions'];
+  const data = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowedFields.includes(key)));
+  const profile = await prisma.projectAccess.update({
+    where: { id: req.params.id },
+    data
+  });
+  res.json(profile);
+});
+
 app.post('/api/guests', async (req, res) => {
   const { weddingId, ...guestData } = req.body;
   const guest = await prisma.guest.create({
@@ -317,8 +352,13 @@ app.put('/api/agenda/:id', async (req, res) => {
 
 // --- MESSAGES ---
 app.get('/api/messages', async (req, res) => {
+  const where = { weddingId: req.weddingId };
+  if (req.query.channel) where.channel = String(req.query.channel);
+  if (req.query.audience) where.audience = String(req.query.audience);
+  if (req.query.vendorId) where.vendorId = String(req.query.vendorId);
+  if (req.query.guestId) where.guestId = String(req.query.guestId);
   const messages = await prisma.message.findMany({ 
-    where: { weddingId: req.weddingId },
+    where,
     orderBy: { createdAt: 'asc' } 
   });
   res.json(messages);
