@@ -40,7 +40,7 @@ export default function BudgetSuivi() {
   const [activeTab, setActiveTab] = useState('payments');
   const [baseBudget, setBaseBudget] = useState(activeWedding?.baseBudget || 0);
   const [paymentForms, setPaymentForms] = useState({});
-  const [quickDocumentForms, setQuickDocumentForms] = useState({});
+  const [documentModalVendor, setDocumentModalVendor] = useState(null);
   const [documentForm, setDocumentForm] = useState({
     title: '',
     vendorId: '',
@@ -72,22 +72,6 @@ export default function BudgetSuivi() {
     }));
   };
 
-  const updateQuickDocumentForm = (vendorId, patch) => {
-    setQuickDocumentForms(prev => ({
-      ...prev,
-      [vendorId]: {
-        title: '',
-        type: 'facture_acompte',
-        amount: '',
-        documentUrl: '',
-        fileName: '',
-        notes: '',
-        ...prev[vendorId],
-        ...patch
-      }
-    }));
-  };
-
   const submitPayment = async (event, vendorId) => {
     event.preventDefault();
     const form = paymentForms[vendorId] || {};
@@ -99,26 +83,6 @@ export default function BudgetSuivi() {
       status: 'paid'
     });
     setPaymentForms(prev => ({ ...prev, [vendorId]: { label: 'Acompte', amount: '', kind: 'acompte' } }));
-  };
-
-  const submitQuickDocument = async (event, vendor) => {
-    event.preventDefault();
-    const form = quickDocumentForms[vendor.id] || {};
-    const fallbackTitle = `${typeLabel(form.type || 'facture_acompte')} - ${vendor.name}`;
-    await addBudgetDocument({
-      vendorId: vendor.id,
-      title: form.title || fallbackTitle,
-      type: form.type || 'facture_acompte',
-      status: 'active',
-      amount: form.amount === '' || form.amount == null ? null : Number(form.amount),
-      documentUrl: form.documentUrl || '',
-      fileName: form.fileName || '',
-      notes: form.notes || ''
-    });
-    setQuickDocumentForms(prev => ({
-      ...prev,
-      [vendor.id]: { title: '', type: 'facture_acompte', amount: '', documentUrl: '', fileName: '', notes: '' }
-    }));
   };
 
   const submitDocument = async (event) => {
@@ -140,6 +104,7 @@ export default function BudgetSuivi() {
       notes: '',
       declinedReason: ''
     });
+    setDocumentModalVendor(null);
   };
 
   const renderDocumentList = (items) => (
@@ -334,56 +299,32 @@ export default function BudgetSuivi() {
                     )}
                   </div>
 
-                  <div className="mt-5 border-t border-outline-variant/40 pt-4">
-                    <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-3">Ajouter un document lié au paiement</p>
-                    <form onSubmit={(event) => submitQuickDocument(event, vendor)} className="grid grid-cols-1 md:grid-cols-6 gap-2">
-                      <select
-                        value={(quickDocumentForms[vendor.id]?.type) || 'facture_acompte'}
-                        onChange={event => updateQuickDocumentForm(vendor.id, { type: event.target.value })}
-                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface"
-                      >
-                        <option value="devis_propose">Devis proposé</option>
-                        <option value="preuve_acompte">Preuve acompte</option>
-                        <option value="facture_acompte">Facture acompte</option>
-                        <option value="facture_finale">Facture finale</option>
-                        <option value="rib_prestataire">RIB prestataire</option>
-                        <option value="contrat">Contrat</option>
-                      </select>
-                      <input
-                        value={(quickDocumentForms[vendor.id]?.title) || ''}
-                        onChange={event => updateQuickDocumentForm(vendor.id, { title: event.target.value })}
-                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface md:col-span-2"
-                        placeholder="Titre"
-                      />
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={(quickDocumentForms[vendor.id]?.amount) || ''}
-                        onChange={event => updateQuickDocumentForm(vendor.id, { amount: event.target.value })}
-                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface"
-                        placeholder="Montant"
-                      />
-                      <input
-                        value={(quickDocumentForms[vendor.id]?.fileName) || ''}
-                        onChange={event => updateQuickDocumentForm(vendor.id, { fileName: event.target.value })}
-                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface"
-                        placeholder="Fichier"
-                      />
-                      <button className="bg-primary text-on-primary rounded-md px-3 py-2 font-label-sm uppercase tracking-widest">Joindre</button>
-                      <input
-                        value={(quickDocumentForms[vendor.id]?.documentUrl) || ''}
-                        onChange={event => updateQuickDocumentForm(vendor.id, { documentUrl: event.target.value })}
-                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface md:col-span-3"
-                        placeholder="Lien Drive / document"
-                      />
-                      <input
-                        value={(quickDocumentForms[vendor.id]?.notes) || ''}
-                        onChange={event => updateQuickDocumentForm(vendor.id, { notes: event.target.value })}
-                        className="border border-outline-variant rounded-md px-3 py-2 bg-surface md:col-span-3"
-                        placeholder="Note rapide"
-                      />
-                    </form>
+                  <div className="mt-5 border-t border-outline-variant/40 pt-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div>
+                      <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary">Documents liés</p>
+                      <p className="text-sm text-on-surface-variant">{(vendor.documents || []).length} document(s) classé(s) pour ce prestataire.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDocumentModalVendor(vendor);
+                        setDocumentForm({
+                          title: '',
+                          vendorId: vendor.id,
+                          type: 'facture_acompte',
+                          status: 'active',
+                          amount: '',
+                          documentUrl: '',
+                          fileName: '',
+                          notes: '',
+                          declinedReason: ''
+                        });
+                      }}
+                      className="inline-flex items-center justify-center gap-2 bg-primary text-on-primary rounded-full px-5 py-3 font-label-sm uppercase tracking-widest hover:bg-primary/90 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">attach_file</span>
+                      Joindre un document
+                    </button>
                   </div>
                 </article>
               );
@@ -395,6 +336,78 @@ export default function BudgetSuivi() {
         {activeTab === 'requests' && renderDocumentList(documentsByTab.requests)}
         {activeTab === 'declined' && renderDocumentList(documentsByTab.declined)}
       </main>
+
+      {documentModalVendor && (
+        <div className="fixed inset-0 z-[180] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <section className="bg-surface border border-outline-variant rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div>
+                <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-2">Document paiement</p>
+                <h2 className="font-headline-md text-headline-md text-on-surface">Joindre un document</h2>
+                <p className="text-sm text-on-surface-variant mt-1">{documentModalVendor.name} - {documentModalVendor.role}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDocumentModalVendor(null)}
+                className="text-on-surface-variant hover:text-primary"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={submitDocument} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Type</span>
+                <select value={documentForm.type} onChange={event => setDocumentForm({ ...documentForm, type: event.target.value })} className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface">
+                  {documentTypes.filter(([value]) => value !== 'demande_devis').map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Montant</span>
+                <input type="number" min="0" step="0.01" value={documentForm.amount} onChange={event => setDocumentForm({ ...documentForm, amount: event.target.value })} className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface" placeholder="Ex: 1250" />
+              </label>
+              <label className="block md:col-span-2">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Titre</span>
+                <input value={documentForm.title} onChange={event => setDocumentForm({ ...documentForm, title: event.target.value })} className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface" placeholder={`Ex: Facture acompte - ${documentModalVendor.name}`} />
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Nom du fichier</span>
+                <input value={documentForm.fileName} onChange={event => setDocumentForm({ ...documentForm, fileName: event.target.value })} className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface" placeholder="facture-acompte.pdf" />
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Lien document</span>
+                <input value={documentForm.documentUrl} onChange={event => setDocumentForm({ ...documentForm, documentUrl: event.target.value })} className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface" placeholder="Lien Drive, facture, RIB..." />
+              </label>
+              <label className="block md:col-span-2">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Notes</span>
+                <textarea rows="3" value={documentForm.notes} onChange={event => setDocumentForm({ ...documentForm, notes: event.target.value })} className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface" placeholder="Référence virement, échéance, condition, vérification à faire..." />
+              </label>
+              <label className="flex items-center gap-3 md:col-span-2 text-sm text-on-surface-variant">
+                <input
+                  type="checkbox"
+                  checked={documentForm.status === 'declined'}
+                  onChange={event => setDocumentForm({ ...documentForm, status: event.target.checked ? 'declined' : 'active' })}
+                />
+                Classer comme devis décliné
+              </label>
+              {documentForm.status === 'declined' && (
+                <label className="block md:col-span-2">
+                  <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Motif du refus</span>
+                  <textarea rows="2" value={documentForm.declinedReason} onChange={event => setDocumentForm({ ...documentForm, declinedReason: event.target.value })} className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface" placeholder="Budget, disponibilité, conditions, doublon..." />
+                </label>
+              )}
+              <div className="md:col-span-2 flex flex-col sm:flex-row justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setDocumentModalVendor(null)} className="border border-outline-variant rounded-full px-5 py-3 text-on-surface-variant">
+                  Annuler
+                </button>
+                <button className="bg-primary text-on-primary rounded-full px-6 py-3 font-label-sm uppercase tracking-widest">
+                  Attacher le document
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
       <BottomNavBar />
     </>
   );
