@@ -212,7 +212,7 @@ export default function BudgetSuivi() {
 
   const exportBudgetCsv = () => {
     const rows = [
-      ['Prestataire', 'Role', 'Contrat', 'Budget', 'Paye', 'Reste', 'Documents manquants', 'Ecart devis'],
+      ['Prestataire', 'Rôle', 'Contrat', 'Budget', 'Payé', 'Reste', 'Documents manquants', 'Écart devis'],
       ...filteredVendors.map(vendor => {
         const health = vendorHealth(vendor);
         return [
@@ -298,8 +298,8 @@ export default function BudgetSuivi() {
               <h2 className="font-headline-sm text-headline-sm text-on-surface">Budget par poste</h2>
             </div>
             <div className="flex gap-4 text-xs text-on-surface-variant">
-              <span className="inline-flex items-center gap-2"><i className="w-3 h-3 rounded-full bg-primary inline-block" /> Engage</span>
-              <span className="inline-flex items-center gap-2"><i className="w-3 h-3 rounded-full bg-secondary inline-block" /> Paye</span>
+              <span className="inline-flex items-center gap-2"><i className="w-3 h-3 rounded-full bg-primary inline-block" /> Engagé</span>
+              <span className="inline-flex items-center gap-2"><i className="w-3 h-3 rounded-full bg-secondary inline-block" /> Payé</span>
             </div>
           </div>
           <div className="space-y-4">
@@ -324,7 +324,7 @@ export default function BudgetSuivi() {
                 </div>
               );
             })}
-            {budgetChartRows.length === 0 && <p className="text-sm text-on-surface-variant">Aucun budget prestataire a afficher.</p>}
+            {budgetChartRows.length === 0 && <p className="text-sm text-on-surface-variant">Aucun budget prestataire à afficher.</p>}
           </div>
         </section>
 
@@ -594,11 +594,11 @@ export default function BudgetSuivi() {
             <strong>{euro.format(base)}</strong>
           </div>
           <div>
-            <span>Engage prestataires</span>
+            <span>Engagé prestataires</span>
             <strong>{euro.format(committed)}</strong>
           </div>
           <div>
-            <span>Paye</span>
+            <span>Payé</span>
             <strong>{euro.format(paid)}</strong>
           </div>
           <div>
@@ -640,10 +640,10 @@ export default function BudgetSuivi() {
             <thead>
               <tr>
                 <th>Prestataire</th>
-                <th>Role</th>
+                <th>Rôle</th>
                 <th>Contrat</th>
                 <th>Devis</th>
-                <th>Paye</th>
+                <th>Payé</th>
                 <th>Reste</th>
                 <th>Docs manquants</th>
               </tr>
@@ -670,14 +670,14 @@ export default function BudgetSuivi() {
         <section className="print-two-columns">
           <div className="print-section">
             <div className="print-section-title">
-              <h2>Paiements enregistres</h2>
-              <p>{paidPayments.length} operation(s) payee(s)</p>
+              <h2>Paiements enregistrés</h2>
+              <p>{paidPayments.length} opération(s) payée(s)</p>
             </div>
             <table>
               <thead>
                 <tr>
                   <th>Prestataire</th>
-                  <th>Operation</th>
+                  <th>Opération</th>
                   <th>Date</th>
                   <th>Montant</th>
                 </tr>
@@ -691,7 +691,7 @@ export default function BudgetSuivi() {
                     <td>{euro.format(payment.amount)}</td>
                   </tr>
                 )) : (
-                  <tr><td colSpan="4">Aucun paiement enregistre.</td></tr>
+                  <tr><td colSpan="4">Aucun paiement enregistré.</td></tr>
                 )}
               </tbody>
             </table>
@@ -699,15 +699,15 @@ export default function BudgetSuivi() {
 
           <div className="print-section">
             <div className="print-section-title">
-              <h2>Echeances a suivre</h2>
-              <p>{duePayments.length} paiement(s) a payer</p>
+              <h2>Échéances à suivre</h2>
+              <p>{duePayments.length} paiement(s) à payer</p>
             </div>
             <table>
               <thead>
                 <tr>
                   <th>Prestataire</th>
-                  <th>Operation</th>
-                  <th>Echeance</th>
+                  <th>Opération</th>
+                  <th>Échéance</th>
                   <th>Montant</th>
                 </tr>
               </thead>
@@ -762,7 +762,7 @@ export default function BudgetSuivi() {
           <section className="print-section print-alert-section">
             <div className="print-section-title">
               <h2>Actions prioritaires</h2>
-              <p>Documents a recuperer</p>
+              <p>Documents à récupérer</p>
             </div>
             <ul>
               {allMissingDocuments.map(item => (

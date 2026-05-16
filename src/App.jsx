@@ -33,6 +33,7 @@ import PrivateThoughts from './pages/PrivateThoughts.jsx';
 import VendorPortal from './pages/VendorPortal.jsx';
 import GuestCalendar from './pages/GuestCalendar.jsx';
 import AccessSettings from './pages/AccessSettings.jsx';
+import InvitationExperience from './pages/InvitationExperience.jsx';
 import { canAccessRoute, visibleNavigation, roleLabels } from './lib/accessControl';
 
 function GuardedRoute({ path, children }) {
@@ -51,6 +52,7 @@ export default function App() {
   const currentAccessRole = useStore(state => state.currentAccessRole);
   const navSections = visibleNavigation(currentAccessRole, activeWedding || {});
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const isPublicInvitation = window.location.pathname.startsWith('/invitation/');
 
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
@@ -131,11 +133,17 @@ export default function App() {
         </div>
       )}
 
-      {!activeWedding && <AgencyDashboard />}
-      {activeWedding && <AccessDebugBar />}
-      {activeWedding && !activeWedding.onboardingComplete && <OnboardingWedding />}
+      {isPublicInvitation && (
+        <Routes>
+          <Route path="/invitation/:weddingId/:guestId" element={<InvitationExperience />} />
+        </Routes>
+      )}
 
-      {activeWedding?.onboardingComplete && (
+      {!isPublicInvitation && !activeWedding && <AgencyDashboard />}
+      {!isPublicInvitation && activeWedding && <AccessDebugBar />}
+      {!isPublicInvitation && activeWedding && !activeWedding.onboardingComplete && <OnboardingWedding />}
+
+      {!isPublicInvitation && activeWedding?.onboardingComplete && (
         <div className="mt-8">
           <Routes>
             <Route path="/" element={<GuardedRoute path="/"><TableauDeBordCockpit /></GuardedRoute>} />

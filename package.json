@@ -15,7 +15,8 @@
     "sync:native": "npx cap sync",
     "build:android": "npm run build && npx cap sync android",
     "build:ios": "npm run build && npx cap sync ios",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test",
+    "test:invitation": "node scripts/invitation-flow-smoke.js"
   },
   "keywords": [],
   "author": "",

@@ -28,6 +28,117 @@ io.on('connection', (socket) => {
 app.use(cors());
 app.use(express.json());
 
+const scopedNotFound = (res, label = 'Resource') => {
+  res.status(404).json({ error: `${label} not found for this wedding` });
+};
+
+async function updateScoped(model, id, weddingId, data, options = {}) {
+  const result = await prisma[model].updateMany({
+    where: { id, weddingId },
+    data
+  });
+  if (result.count === 0) return null;
+  return prisma[model].findUnique({
+    where: { id },
+    ...options
+  });
+}
+
+const ROLES = {
+  SUPER_USER: 'super_user',
+  COUPLE: 'couple',
+  WEDDING_PLANNER: 'wedding_planner',
+  VENDOR: 'vendor',
+  GUEST: 'guest',
+  BENEFICIARY: 'beneficiary'
+};
+
+const VALID_ROLES = new Set(Object.values(ROLES));
+
+const canUseGlobalWeddingRoute = (method, role) => {
+  if (method === 'GET') {
+    return [ROLES.SUPER_USER, ROLES.COUPLE, ROLES.WEDDING_PLANNER, ROLES.BENEFICIARY].includes(role);
+  }
+  if (method === 'POST') {
+    return [ROLES.SUPER_USER, ROLES.COUPLE, ROLES.WEDDING_PLANNER].includes(role);
+  }
+  return false;
+};
+
+function roleDenied(res) {
+  res.status(403).json({ error: 'Access denied for this role' });
+}
+
+function requireAnyRole(req, res, roles) {
+  if (roles.includes(req.accessRole)) return true;
+  roleDenied(res);
+  return false;
+}
+
+function canAccessProjectApi(req) {
+  const role = req.accessRole;
+  const method = req.method;
+  const path = req.path;
+  const isWrite = !['GET', 'HEAD', 'OPTIONS'].includes(method);
+  const projectEditors = [ROLES.SUPER_USER, ROLES.COUPLE, ROLES.WEDDING_PLANNER];
+
+  if (path === '/api/agenda') {
+    return isWrite
+      ? projectEditors.includes(role)
+      : [...projectEditors, ROLES.VENDOR, ROLES.GUEST, ROLES.BENEFICIARY].includes(role);
+  }
+  if (path.startsWith('/api/agenda/')) return projectEditors.includes(role);
+
+  if (path === '/api/messages') {
+    return method === 'POST'
+      ? [...projectEditors, ROLES.VENDOR].includes(role)
+      : [...projectEditors, ROLES.VENDOR, ROLES.GUEST].includes(role);
+  }
+
+  if (path === '/api/thoughts') {
+    if (isWrite) return [ROLES.SUPER_USER, ROLES.COUPLE].includes(role);
+    return [ROLES.SUPER_USER, ROLES.COUPLE].includes(role)
+      || (role === ROLES.WEDDING_PLANNER && Boolean(req.wedding?.plannerCanSeePrivateThoughts));
+  }
+
+  if (path === '/api/access-profiles' || path.startsWith('/api/access-profiles/')) {
+    return projectEditors.includes(role);
+  }
+
+  if (path === '/api/guests' || path.startsWith('/api/guests/')) {
+    return projectEditors.includes(role);
+  }
+
+  if (path === '/api/tables') {
+    return isWrite ? projectEditors.includes(role) : [...projectEditors, ROLES.VENDOR].includes(role);
+  }
+  if (path.startsWith('/api/tables/')) return projectEditors.includes(role);
+
+  if (path === '/api/tracks' || path.startsWith('/api/tracks/')) {
+    return [...projectEditors, ROLES.VENDOR].includes(role);
+  }
+
+  if (path === '/api/vendors') {
+    return isWrite ? projectEditors.includes(role) : [...projectEditors, ROLES.VENDOR].includes(role);
+  }
+  if (path.startsWith('/api/vendors/') || path.startsWith('/api/vendor-payments/')) {
+    return projectEditors.includes(role);
+  }
+
+  if (path === '/api/budget-documents') {
+    return isWrite
+      ? projectEditors.includes(role)
+      : [...projectEditors, ROLES.BENEFICIARY].includes(role);
+  }
+  if (path.startsWith('/api/budget-documents/')) {
+    return method === 'GET'
+      ? [...projectEditors, ROLES.BENEFICIARY].includes(role)
+      : projectEditors.includes(role);
+  }
+
+  return false;
+}
+
 const defaultPlanningTasks = [
   ['J-365', 'Définir le budget de base', 'Valider l’enveloppe globale avec les mariés et les bénéficiaires.'],
   ['J-300', 'Réserver le lieu', 'Comparer les lieux, bloquer la date et suivre l’acompte.'],
@@ -88,6 +199,90 @@ app.post('/api/upload-apk', upload.single('apkFile'), (req, res) => {
   });
 });
 
+app.get('/api/public/invitations/:weddingId/:guestId', async (req, res) => {
+  try {
+    const [wedding, guest] = await Promise.all([
+      prisma.wedding.findUnique({
+        where: { id: req.params.weddingId },
+        select: {
+          id: true,
+          name: true,
+          date: true,
+          brideName: true,
+          groomName: true,
+          venueAddress: true,
+          invitationTitle: true,
+          invitationMessage: true,
+          invitationDetails: true,
+          invitationDesignUrl: true,
+          invitationBackText: true,
+          invitationStyle: true,
+          rsvpConfirmedMessage: true,
+          rsvpDeclinedMessage: true,
+          agenda: {
+            where: {
+              OR: [
+                { audience: 'all' },
+                { audience: 'guest' }
+              ]
+            },
+            orderBy: { orderIndex: 'asc' }
+          }
+        }
+      }),
+      prisma.guest.findFirst({
+        where: { id: req.params.guestId, weddingId: req.params.weddingId },
+        select: { id: true, name: true, status: true, groupName: true, circle: true, calendarGroup: true }
+      })
+    ]);
+
+    if (!wedding || !guest) return scopedNotFound(res, 'Invitation');
+    res.json({ wedding, guest });
+  } catch (error) {
+    console.error('Error fetching public invitation:', error);
+    res.status(500).json({ error: 'Failed to fetch invitation' });
+  }
+});
+
+app.post('/api/public/invitations/:weddingId/:guestId/rsvp', async (req, res) => {
+  try {
+    const status = req.body.status === 'Declined' ? 'Declined' : 'Confirmed';
+    const result = await prisma.guest.updateMany({
+      where: { id: req.params.guestId, weddingId: req.params.weddingId },
+      data: { status }
+    });
+    if (result.count === 0) return scopedNotFound(res, 'Invitation');
+
+    const guest = await prisma.guest.findUnique({ where: { id: req.params.guestId } });
+    io.emit('guestUpdated', guest);
+    res.json({ ok: true, guest });
+  } catch (error) {
+    console.error('Error updating public RSVP:', error);
+    res.status(500).json({ error: 'Failed to update RSVP' });
+  }
+});
+
+app.use((req, res, next) => {
+  if (!req.path.startsWith('/api')) return next();
+
+  const role = String(req.headers['x-access-role'] || '').trim();
+  if (!VALID_ROLES.has(role)) {
+    return res.status(401).json({ error: 'A valid x-access-role header is required.' });
+  }
+
+  req.accessRole = role;
+
+  if (req.path === '/api/weddings') {
+    return canUseGlobalWeddingRoute(req.method, role) ? next() : roleDenied(res);
+  }
+
+  if (req.path.startsWith('/api/weddings/')) {
+    return requireAnyRole(req, res, [ROLES.SUPER_USER, ROLES.COUPLE, ROLES.WEDDING_PLANNER]) ? next() : undefined;
+  }
+
+  next();
+});
+
 // --- WEDDINGS (SAAS PROJECTS) ---
 app.get('/api/weddings', async (req, res) => {
   try {
@@ -134,6 +329,14 @@ app.post('/api/weddings', async (req, res) => {
         venueAddress: req.body.venueAddress || null,
         venueAccessTime: req.body.venueAccessTime || null,
         vendorInstructions: req.body.vendorInstructions || null,
+        invitationTitle: req.body.invitationTitle || null,
+        invitationMessage: req.body.invitationMessage || null,
+        invitationDetails: req.body.invitationDetails || null,
+        invitationDesignUrl: req.body.invitationDesignUrl || null,
+        invitationBackText: req.body.invitationBackText || null,
+        invitationStyle: req.body.invitationStyle || 'linen',
+        rsvpConfirmedMessage: req.body.rsvpConfirmedMessage || null,
+        rsvpDeclinedMessage: req.body.rsvpDeclinedMessage || null,
         agenda: {
           create: defaultPlanningTasks.map(([time, title, description], index) => ({
             time,
@@ -188,7 +391,15 @@ app.put('/api/weddings/:id', async (req, res) => {
     'vendorDelegationMode',
     'venueAddress',
     'venueAccessTime',
-    'vendorInstructions'
+    'vendorInstructions',
+    'invitationTitle',
+    'invitationMessage',
+    'invitationDetails',
+    'invitationDesignUrl',
+    'invitationBackText',
+    'invitationStyle',
+    'rsvpConfirmedMessage',
+    'rsvpDeclinedMessage'
   ];
   const data = Object.fromEntries(
     Object.entries(req.body).filter(([key]) => allowedFields.includes(key))
@@ -207,15 +418,29 @@ app.put('/api/weddings/:id', async (req, res) => {
 // Middleware SaaS Multi-Projets (Bloquant)
 app.use(async (req, res, next) => {
   // Certaines routes globales (ex: lister les mariages) ne nécessitent pas de projet actif
-  if (req.path === '/api/weddings') return next();
+  if (req.path === '/api/weddings' || req.path.startsWith('/api/weddings/')) return next();
 
   const weddingId = req.headers['x-wedding-id'];
   
   if (!weddingId) {
     return res.status(400).json({ error: "Un identifiant de mariage (x-wedding-id) est obligatoire." });
   }
+
+  const wedding = await prisma.wedding.findUnique({
+    where: { id: weddingId },
+    select: {
+      id: true,
+      plannerAccessEnabled: true,
+      plannerCanSeePrivateThoughts: true,
+      plannerCanSeeCoupleDirectMessages: true
+    }
+  });
+
+  if (!wedding) return scopedNotFound(res, 'Wedding');
   
   req.weddingId = weddingId;
+  req.wedding = wedding;
+  if (!canAccessProjectApi(req)) return roleDenied(res);
   next();
 });
 
@@ -227,8 +452,10 @@ app.get('/api/guests', async (req, res) => {
 
 // --- PRIVATE COUPLE THOUGHTS ---
 app.get('/api/thoughts', async (req, res) => {
+  const where = { weddingId: req.weddingId };
+  if (req.accessRole === ROLES.WEDDING_PLANNER) where.sharedWithPlanner = true;
   const thoughts = await prisma.weddingThought.findMany({
-    where: { weddingId: req.weddingId },
+    where,
     orderBy: { createdAt: 'desc' }
   });
   res.json(thoughts);
@@ -275,10 +502,8 @@ app.post('/api/access-profiles', async (req, res) => {
 app.put('/api/access-profiles/:id', async (req, res) => {
   const allowedFields = ['role', 'displayName', 'email', 'vendorId', 'guestId', 'isSuperUser', 'permissions'];
   const data = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowedFields.includes(key)));
-  const profile = await prisma.projectAccess.update({
-    where: { id: req.params.id },
-    data
-  });
+  const profile = await updateScoped('projectAccess', req.params.id, req.weddingId, data);
+  if (!profile) return scopedNotFound(res, 'Access profile');
   res.json(profile);
 });
 
@@ -297,10 +522,8 @@ app.post('/api/guests', async (req, res) => {
 
 app.put('/api/guests/:id', async (req, res) => {
   try {
-    const guest = await prisma.guest.update({
-      where: { id: req.params.id },
-      data: req.body,
-    });
+    const guest = await updateScoped('guest', req.params.id, req.weddingId, req.body);
+    if (!guest) return scopedNotFound(res, 'Guest');
     io.emit('guestUpdated', guest); // Notification temps réel
     res.json(guest);
   } catch (error) {
@@ -342,10 +565,8 @@ app.put('/api/tables/:id', async (req, res) => {
     if (data.topPos != null) data.topPos = String(data.topPos);
     if (data.leftPos != null) data.leftPos = String(data.leftPos);
     if (data.chairs != null) data.chairs = Number(data.chairs) || 0;
-    const table = await prisma.table.update({
-      where: { id: req.params.id },
-      data
-    });
+    const table = await updateScoped('table', req.params.id, req.weddingId, data);
+    if (!table) return scopedNotFound(res, 'Table');
     io.emit('tableUpdated', table);
     res.json(table);
   } catch (error) {
@@ -356,8 +577,9 @@ app.put('/api/tables/:id', async (req, res) => {
 
 app.delete('/api/tables/:id', async (req, res) => {
   try {
-    await prisma.guest.updateMany({ where: { tableId: req.params.id }, data: { tableId: null } });
-    await prisma.table.delete({ where: { id: req.params.id } });
+    await prisma.guest.updateMany({ where: { weddingId: req.weddingId, tableId: req.params.id }, data: { tableId: null } });
+    const result = await prisma.table.deleteMany({ where: { id: req.params.id, weddingId: req.weddingId } });
+    if (result.count === 0) return scopedNotFound(res, 'Table');
     io.emit('tableDeleted', { id: req.params.id });
     res.json({ ok: true });
   } catch (error) {
@@ -368,8 +590,28 @@ app.delete('/api/tables/:id', async (req, res) => {
 
 // --- AGENDA ---
 app.get('/api/agenda', async (req, res) => {
+  const where = { weddingId: req.weddingId };
+  if (req.accessRole === ROLES.GUEST) {
+    const guestGroup = String(req.headers['x-guest-group'] || '');
+    where.OR = [
+      { audience: 'all' },
+      { audience: ROLES.GUEST, guestGroup: null },
+      { audience: ROLES.GUEST, guestGroup }
+    ];
+  } else if (req.accessRole === ROLES.VENDOR) {
+    where.OR = [
+      { audience: 'all' },
+      { audience: ROLES.VENDOR }
+    ];
+  } else if (req.accessRole === ROLES.BENEFICIARY) {
+    where.OR = [
+      { audience: 'all' },
+      { audience: ROLES.BENEFICIARY }
+    ];
+  }
+
   const items = await prisma.agendaItem.findMany({ 
-    where: { weddingId: req.weddingId },
+    where,
     orderBy: { time: 'asc' } 
   });
   res.json(items);
@@ -395,10 +637,8 @@ app.post('/api/agenda', async (req, res) => {
 });
 
 app.put('/api/agenda/:id', async (req, res) => {
-  const item = await prisma.agendaItem.update({
-    where: { id: req.params.id },
-    data: req.body,
-  });
+  const item = await updateScoped('agendaItem', req.params.id, req.weddingId, req.body);
+  if (!item) return scopedNotFound(res, 'Agenda item');
   io.emit('agendaUpdated', item); // Notification temps réel
   res.json(item);
 });
@@ -410,6 +650,22 @@ app.get('/api/messages', async (req, res) => {
   if (req.query.audience) where.audience = String(req.query.audience);
   if (req.query.vendorId) where.vendorId = String(req.query.vendorId);
   if (req.query.guestId) where.guestId = String(req.query.guestId);
+  if (req.accessRole === ROLES.WEDDING_PLANNER && !req.wedding.plannerCanSeeCoupleDirectMessages) {
+    where.NOT = [{ channel: 'couple_direct' }, { isPrivate: true }];
+  }
+  if (req.accessRole === ROLES.VENDOR) {
+    where.OR = [
+      { audience: ROLES.VENDOR },
+      { channel: 'planner_vendor' },
+      { channel: 'day_logistics' }
+    ];
+  }
+  if (req.accessRole === ROLES.GUEST) {
+    where.OR = [
+      { audience: ROLES.GUEST },
+      { channel: 'day_logistics' }
+    ];
+  }
   const messages = await prisma.message.findMany({ 
     where,
     orderBy: { createdAt: 'asc' } 
@@ -419,10 +675,19 @@ app.get('/api/messages', async (req, res) => {
 
 app.post('/api/messages', async (req, res) => {
   const { weddingId, ...msgData } = req.body;
+  const channel = req.body.channel || 'backstage';
+  if (channel === 'couple_direct') {
+    const canWriteCoupleDirect = [ROLES.SUPER_USER, ROLES.COUPLE].includes(req.accessRole)
+      || (req.accessRole === ROLES.WEDDING_PLANNER && req.wedding.plannerCanSeeCoupleDirectMessages);
+    if (!canWriteCoupleDirect) return roleDenied(res);
+  }
+  if (req.accessRole === ROLES.VENDOR && !['planner_vendor', 'day_logistics'].includes(channel)) {
+    return roleDenied(res);
+  }
   const message = await prisma.message.create({
     data: {
       ...msgData,
-      channel: req.body.channel || 'backstage',
+      channel,
       audience: req.body.audience || 'planner',
       isPrivate: Boolean(req.body.isPrivate),
       weddingId: req.weddingId
@@ -449,10 +714,8 @@ app.post('/api/tracks', async (req, res) => {
 });
 
 app.put('/api/tracks/:id', async (req, res) => {
-  const track = await prisma.track.update({
-    where: { id: req.params.id },
-    data: req.body,
-  });
+  const track = await updateScoped('track', req.params.id, req.weddingId, req.body);
+  if (!track) return scopedNotFound(res, 'Track');
   io.emit('trackUpdated', track);
   res.json(track);
 });
@@ -488,18 +751,23 @@ app.post('/api/vendors', async (req, res) => {
 });
 
 app.put('/api/vendors/:id', async (req, res) => {
-  const vendor = await prisma.vendor.update({
-    where: { id: req.params.id },
-    data: req.body,
+  const vendor = await updateScoped('vendor', req.params.id, req.weddingId, req.body, {
     include: {
       payments: { orderBy: { paidAt: 'desc' } },
       documents: { orderBy: { createdAt: 'desc' } }
     }
   });
+  if (!vendor) return scopedNotFound(res, 'Vendor');
   res.json(vendor);
 });
 
 app.post('/api/vendors/:id/payments', async (req, res) => {
+  const vendorExists = await prisma.vendor.findFirst({
+    where: { id: req.params.id, weddingId: req.weddingId },
+    select: { id: true }
+  });
+  if (!vendorExists) return scopedNotFound(res, 'Vendor');
+
   const amount = Number(req.body.amount) || 0;
   const payment = await prisma.vendorPayment.create({
     data: {
@@ -575,25 +843,30 @@ app.put('/api/budget-documents/:id', async (req, res) => {
   if ('verifiedAt' in data) data.verifiedAt = data.verifiedAt ? new Date(data.verifiedAt) : null;
   if ('requestedAt' in data) data.requestedAt = data.requestedAt ? new Date(data.requestedAt) : null;
   if ('receivedAt' in data) data.receivedAt = data.receivedAt ? new Date(data.receivedAt) : null;
-  const document = await prisma.budgetDocument.update({
-    where: { id: req.params.id },
-    data,
+  const document = await updateScoped('budgetDocument', req.params.id, req.weddingId, data, {
     include: { vendor: true }
   });
+  if (!document) return scopedNotFound(res, 'Budget document');
   res.json(document);
 });
 
 app.delete('/api/budget-documents/:id', async (req, res) => {
-  await prisma.budgetDocument.delete({ where: { id: req.params.id } });
+  const result = await prisma.budgetDocument.deleteMany({ where: { id: req.params.id, weddingId: req.weddingId } });
+  if (result.count === 0) return scopedNotFound(res, 'Budget document');
   res.json({ ok: true });
 });
 
 app.delete('/api/vendor-payments/:id', async (req, res) => {
+  const paymentToDelete = await prisma.vendorPayment.findFirst({
+    where: { id: req.params.id, weddingId: req.weddingId }
+  });
+  if (!paymentToDelete) return scopedNotFound(res, 'Vendor payment');
+
   const payment = await prisma.vendorPayment.delete({
-    where: { id: req.params.id }
+    where: { id: paymentToDelete.id }
   });
   const aggregate = await prisma.vendorPayment.aggregate({
-    where: { vendorId: payment.vendorId, status: 'paid' },
+    where: { vendorId: payment.vendorId, weddingId: req.weddingId, status: 'paid' },
     _sum: { amount: true }
   });
   const vendor = await prisma.vendor.update({

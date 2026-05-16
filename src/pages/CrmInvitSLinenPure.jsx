@@ -8,6 +8,7 @@ export default function CrmInvitSLinenPure() {
   const guests = useStore(state => state.guests);
   const updateGuestStatus = useStore(state => state.updateGuestStatus);
   const addGuest = useStore(state => state.addGuest);
+  const activeWedding = useStore(state => state.activeWedding);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All Circles');
@@ -33,6 +34,9 @@ export default function CrmInvitSLinenPure() {
   const totalAttending = guests.filter(g => g.status === 'Confirmed').length;
   const pendingRsvps = guests.filter(g => g.status === 'Pending').length;
   const dietaryReqs = guests.filter(g => g.diet).length;
+  const invitationLink = selectedGuestForQr && activeWedding
+    ? `${window.location.origin}/invitation/${activeWedding.id}/${selectedGuestForQr.id}`
+    : '';
 
   return (
     <>
@@ -240,7 +244,7 @@ export default function CrmInvitSLinenPure() {
       
       <div className="bg-white p-4 rounded-xl shadow-inner border border-outline-variant/30 mb-8">
         <QRCodeSVG 
-          value={selectedGuestForQr.id} 
+          value={invitationLink || selectedGuestForQr.id} 
           size={200}
           bgColor={"#ffffff"}
           fgColor={"#000000"}
@@ -249,7 +253,13 @@ export default function CrmInvitSLinenPure() {
         />
       </div>
       
-      <p className="font-body-md text-body-md text-on-surface-variant italic mb-6">À scanner à l'entrée pour le placement en salle.</p>
+      <p className="font-body-md text-body-md text-on-surface-variant italic mb-4">À scanner pour ouvrir le faire-part et répondre à l'invitation.</p>
+      {invitationLink && (
+        <div className="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 mb-5 text-left">
+          <p className="text-xs uppercase tracking-widest text-secondary mb-1">Lien faire-part</p>
+          <p className="text-xs text-on-surface break-all">{invitationLink}</p>
+        </div>
+      )}
       
       <button 
         onClick={() => window.print()}
@@ -261,13 +271,14 @@ export default function CrmInvitSLinenPure() {
       
       <button 
         onClick={() => {
-          useStore.getState().showToast(`Faire-part et Pass envoyés à ${selectedGuestForQr.name}`);
+          if (invitationLink && navigator.clipboard) navigator.clipboard.writeText(invitationLink);
+          useStore.getState().showToast(`Lien du faire-part prêt pour ${selectedGuestForQr.name}`);
           setQrModalOpen(false);
         }}
         className="w-full bg-primary text-on-primary px-6 py-3 rounded-full font-label-sm text-label-sm uppercase tracking-widest hover:bg-primary/90 transition-colors flex justify-center items-center gap-2"
       >
         <span className="material-symbols-outlined text-sm">send</span>
-        Envoyer Faire-Part (Email/SMS)
+        Copier le lien Faire-Part
       </button>
     </div>
   </div>

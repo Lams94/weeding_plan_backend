@@ -524,7 +524,7 @@ export default function GestionDesTablesMappingSpatial() {
 
           <aside className="bg-surface border border-outline-variant rounded-xl p-4 h-fit max-h-[760px] flex flex-col">
             <div className="flex items-center justify-between mb-4">
-              <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary">Invites a placer</p>
+              <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary">Invités à placer</p>
               <span className="rounded-full bg-surface-container-low px-3 py-1 text-sm">{unseatedGuests.length}</span>
             </div>
             <div className="space-y-2 overflow-y-auto pr-1">
@@ -536,10 +536,10 @@ export default function GestionDesTablesMappingSpatial() {
                   className="border border-outline-variant rounded-md p-3 bg-surface-container-low cursor-grab active:cursor-grabbing"
                 >
                   <p className="font-medium text-on-surface">{guest.name}</p>
-                  <p className="text-xs text-secondary">{guest.circle || guest.groupName || 'Invite'}</p>
+                  <p className="text-xs text-secondary">{guest.circle || guest.groupName || 'Invité'}</p>
                 </div>
               ))}
-              {unseatedGuests.length === 0 && <p className="text-sm text-on-surface-variant text-center py-10">Tous les invites sont places.</p>}
+              {unseatedGuests.length === 0 && <p className="text-sm text-on-surface-variant text-center py-10">Tous les invités sont placés.</p>}
             </div>
 
             {selectedTable && (

@@ -3,16 +3,24 @@ import { io } from 'socket.io-client';
 
 const DEFAULT_API_BASE_URL = 'https://weedingplanbackend-production.up.railway.app';
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, '');
-const apiFetch = (path, options) => fetch(`${API_BASE_URL}${path}`, options);
+const LOCAL_STATE_KEY = 'weddingPlan.localState.v1';
+const ACCESS_ROLE_KEY = 'weddingPlan.currentAccessRole.v1';
+const GUEST_GROUP_KEY = 'weddingPlan.currentGuestGroup.v1';
+const readAccessHeader = (key, fallback) => {
+  if (typeof window === 'undefined') return fallback;
+  return window.localStorage.getItem(key) || fallback;
+};
+const apiFetch = (path, options = {}) => {
+  const headers = new Headers(options.headers || {});
+  if (!headers.has('x-access-role')) headers.set('x-access-role', readAccessHeader(ACCESS_ROLE_KEY, 'super_user'));
+  if (!headers.has('x-guest-group')) headers.set('x-guest-group', readAccessHeader(GUEST_GROUP_KEY, 'famille'));
+  return fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+};
 
 // Initialisation de la connexion Socket.io vers le serveur distant si configuré.
 const socket = io(API_BASE_URL, {
   autoConnect: Boolean(API_BASE_URL)
 });
-
-const LOCAL_STATE_KEY = 'weddingPlan.localState.v1';
-const ACCESS_ROLE_KEY = 'weddingPlan.currentAccessRole.v1';
-const GUEST_GROUP_KEY = 'weddingPlan.currentGuestGroup.v1';
 
 const makeId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -32,6 +40,14 @@ const defaultLocalState = () => {
     ownerRole: 'couple',
     baseBudget: 0,
     onboardingComplete: true,
+    invitationTitle: 'Vous êtes invités',
+    invitationMessage: 'Nous serions honorés de vous compter parmi nous pour célébrer notre mariage.',
+    invitationDetails: 'Cérémonie, dîner et soirée dans un lieu qui nous ressemble.',
+    invitationDesignUrl: '',
+    invitationBackText: 'Votre présence est notre plus beau cadeau.',
+    invitationStyle: 'linen',
+    rsvpConfirmedMessage: '',
+    rsvpDeclinedMessage: '',
     createdAt: new Date().toISOString(),
     guests: [],
     vendors: [],
@@ -456,6 +472,10 @@ const useStore = create((set, get) => ({
     return item;
   },
 
+  updateInvitationSettings: async (data) => {
+    await get().updateWedding(data);
+  },
+
   importRetroplanning: async (tasks) => {
     if (!get().activeWedding) return;
     set({ isLoading: true });
@@ -703,13 +723,13 @@ const useStore = create((set, get) => ({
       const nextTables = [...get().tables, newTable];
       set({ tables: nextTables });
       writeLocalProject(get().activeWedding.id, { ...readLocalProject(get().activeWedding.id), tables: nextTables });
-      get().showToast('Table ajoutee');
+      get().showToast('Table ajoutée');
     } catch (e) {
       const localTable = { id: makeId('local-table'), ...payload, weddingId: get().activeWedding.id };
       const nextTables = [...get().tables, localTable];
       set({ tables: nextTables });
       writeLocalProject(get().activeWedding.id, { ...readLocalProject(get().activeWedding.id), tables: nextTables });
-      get().showToast('Table ajoutee sur ce telephone');
+      get().showToast('Table ajoutée sur ce téléphone');
     }
   },
 

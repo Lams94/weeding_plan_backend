@@ -45,8 +45,9 @@ export const navigationSections = [
     items: [
       { to: '/', label: 'Dashboard Cockpit', icon: 'dashboard' },
       { to: '/planning', label: 'Todo & Planning', icon: 'checklist' },
-      { to: '/private-thoughts', label: 'Pensées mariés', icon: 'auto_stories' },
+      { to: '/private-thoughts', label: 'Pensées des mariés', icon: 'auto_stories' },
       { to: '/access', label: 'Accès & délégations', icon: 'admin_panel_settings' },
+      { to: '/canva', label: 'Studio faire-part', icon: 'drafts' },
       { to: '/budget', label: 'Budget & Paiements', icon: 'payments' }
     ]
   },
@@ -72,7 +73,6 @@ export const navigationSections = [
   {
     title: 'Studio',
     items: [
-      { to: '/canva', label: 'Canva Editor', icon: 'palette' },
       { to: '/music', label: 'Music Studio DJ', icon: 'queue_music' }
     ]
   }
@@ -108,7 +108,7 @@ export function canSeePrivateThoughts(role, wedding) {
 
 export function agendaVisibleForRole(item, role, selectedGuestGroup = '') {
   if (role === ROLES.SUPER_USER || !item.audience || item.audience === 'all') return true;
+  if (role === ROLES.GUEST && item.guestGroup) return item.audience === ROLES.GUEST && item.guestGroup === selectedGuestGroup;
   if (item.audience === role) return true;
-  if (role === ROLES.GUEST && item.guestGroup) return item.guestGroup === selectedGuestGroup;
   return false;
 }

@@ -28,6 +28,14 @@ model Wedding {
   venueAddress       String?
   venueAccessTime    String?
   vendorInstructions String?
+  invitationTitle     String?
+  invitationMessage   String?
+  invitationDetails   String?
+  invitationDesignUrl String?
+  invitationBackText  String?
+  invitationStyle     String          @default("linen")
+  rsvpConfirmedMessage String?
+  rsvpDeclinedMessage  String?
   guests             Guest[]
   tables             Table[]
   agenda             AgendaItem[]
