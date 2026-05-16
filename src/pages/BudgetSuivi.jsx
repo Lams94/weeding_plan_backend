@@ -109,6 +109,18 @@ export default function BudgetSuivi() {
   });
   const paidPayments = filteredVendors.flatMap(vendor => (vendor.payments || []).filter(payment => payment.status === 'paid').map(payment => ({ ...payment, vendorName: vendor.name, vendorRole: vendor.role })));
   const duePayments = filteredVendors.flatMap(vendor => (vendor.payments || []).filter(payment => payment.status !== 'paid').map(payment => ({ ...payment, vendorName: vendor.name, vendorRole: vendor.role })));
+  const budgetChartRows = useMemo(() => {
+    const grouped = filteredVendors.reduce((acc, vendor) => {
+      const role = vendor.role || 'Autre';
+      acc[role] = acc[role] || { role, budget: 0, paid: 0, count: 0 };
+      acc[role].budget += Number(vendor.budget) || 0;
+      acc[role].paid += Number(vendor.paid) || 0;
+      acc[role].count += 1;
+      return acc;
+    }, {});
+    return Object.values(grouped).sort((a, b) => b.budget - a.budget).slice(0, 8);
+  }, [filteredVendors]);
+  const maxChartValue = Math.max(1, ...budgetChartRows.map(row => row.budget));
 
   const updatePaymentForm = (vendorId, patch) => {
     setPaymentForms(prev => ({
@@ -278,6 +290,43 @@ export default function BudgetSuivi() {
             <div className="h-full bg-primary rounded-full" style={{ width: `${paidRate}%` }} />
           </div>
         </div>
+
+        <section className="bg-surface border border-outline-variant rounded-xl p-5 mb-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-5">
+            <div>
+              <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-2">Graphique</p>
+              <h2 className="font-headline-sm text-headline-sm text-on-surface">Budget par poste</h2>
+            </div>
+            <div className="flex gap-4 text-xs text-on-surface-variant">
+              <span className="inline-flex items-center gap-2"><i className="w-3 h-3 rounded-full bg-primary inline-block" /> Engage</span>
+              <span className="inline-flex items-center gap-2"><i className="w-3 h-3 rounded-full bg-secondary inline-block" /> Paye</span>
+            </div>
+          </div>
+          <div className="space-y-4">
+            {budgetChartRows.map(row => {
+              const budgetWidth = Math.max(2, Math.round((row.budget / maxChartValue) * 100));
+              const paidWidth = row.budget > 0 ? Math.min(100, Math.round((row.paid / row.budget) * 100)) : 0;
+              return (
+                <div key={row.role} className="grid grid-cols-1 md:grid-cols-[180px_1fr_160px] gap-2 md:items-center">
+                  <div>
+                    <p className="font-medium text-on-surface truncate">{row.role}</p>
+                    <p className="text-xs text-secondary">{row.count} prestataire(s)</p>
+                  </div>
+                  <div className="h-7 bg-surface-container-low rounded-full overflow-hidden border border-outline-variant/50">
+                    <div className="h-full bg-primary/25 rounded-full" style={{ width: `${budgetWidth}%` }}>
+                      <div className="h-full bg-secondary rounded-full" style={{ width: `${paidWidth}%` }} />
+                    </div>
+                  </div>
+                  <p className="text-sm text-on-surface md:text-right">
+                    <strong>{euro.format(row.budget)}</strong>
+                    <span className="text-secondary"> / {euro.format(row.paid)}</span>
+                  </p>
+                </div>
+              );
+            })}
+            {budgetChartRows.length === 0 && <p className="text-sm text-on-surface-variant">Aucun budget prestataire a afficher.</p>}
+          </div>
+        </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
           <div className="bg-surface border border-outline-variant rounded-xl p-5">
@@ -555,6 +604,30 @@ export default function BudgetSuivi() {
           <div>
             <span>Reste budget</span>
             <strong>{euro.format(remaining)}</strong>
+          </div>
+        </section>
+
+        <section className="print-section print-chart-section">
+          <div className="print-section-title">
+            <h2>Graphique budget par poste</h2>
+            <p>Barre claire: engage - barre foncee: paye</p>
+          </div>
+          <div className="print-chart">
+            {budgetChartRows.map(row => {
+              const budgetWidth = Math.max(2, Math.round((row.budget / maxChartValue) * 100));
+              const paidWidth = row.budget > 0 ? Math.min(100, Math.round((row.paid / row.budget) * 100)) : 0;
+              return (
+                <div key={row.role} className="print-chart-row">
+                  <span>{row.role}</span>
+                  <div className="print-chart-track">
+                    <div className="print-chart-budget" style={{ width: `${budgetWidth}%` }}>
+                      <div className="print-chart-paid" style={{ width: `${paidWidth}%` }} />
+                    </div>
+                  </div>
+                  <strong>{euro.format(row.budget)}</strong>
+                </div>
+              );
+            })}
           </div>
         </section>
 

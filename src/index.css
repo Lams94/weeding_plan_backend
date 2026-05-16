@@ -287,6 +287,48 @@
     font-size: 15px;
   }
 
+  .print-chart {
+    display: grid;
+    gap: 6px;
+  }
+
+  .print-chart-row {
+    display: grid;
+    grid-template-columns: 95px 1fr 82px;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .print-chart-row span {
+    overflow: hidden;
+    color: #171717;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .print-chart-row strong {
+    color: #171717;
+    font-size: 9px;
+    text-align: right;
+  }
+
+  .print-chart-track {
+    height: 13px;
+    background: #f6f3f2;
+    border: 1px solid #d1c5b4;
+  }
+
+  .print-chart-budget {
+    height: 100%;
+    background: #d9cba9;
+  }
+
+  .print-chart-paid {
+    height: 100%;
+    background: #775a19;
+  }
+
   .print-section {
     margin-top: 14px;
     break-inside: avoid;
