@@ -87,6 +87,45 @@ export default function GestionDesTablesMappingSpatial() {
     window.localStorage.setItem(storageKey, JSON.stringify({ backgroundImage, backgroundOpacity, planElements }));
   }, [backgroundImage, backgroundOpacity, planElements, storageKey]);
 
+  const moveSelection = (deltaX, deltaY) => {
+    if (selectedElement) {
+      updateElement(selectedElement.id, {
+        x: Number(clamp(selectedElement.x + deltaX, 0, 100 - selectedElement.w).toFixed(2)),
+        y: Number(clamp(selectedElement.y + deltaY, 0, 100 - selectedElement.h).toFixed(2))
+      });
+      return;
+    }
+    if (selectedTable) {
+      updateTable(selectedTable.id, {
+        leftPos: String(clamp(parsePercent(selectedTable.leftPos, 50) + deltaX, 2, 98).toFixed(2)),
+        topPos: String(clamp(parsePercent(selectedTable.topPos, 50) + deltaY, 2, 98).toFixed(2))
+      });
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (!selectedElement && !selectedTable) return;
+      if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      const target = event.target;
+      if (target?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+
+      event.preventDefault();
+      const step = event.shiftKey ? 1 : event.altKey ? 0.1 : 0.25;
+      const directions = {
+        ArrowUp: [0, -step],
+        ArrowDown: [0, step],
+        ArrowLeft: [-step, 0],
+        ArrowRight: [step, 0]
+      };
+      const [deltaX, deltaY] = directions[event.key];
+      moveSelection(deltaX, deltaY);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedElement, selectedTable]);
+
   const positionFromEvent = (event) => {
     const rect = canvasRef.current.getBoundingClientRect();
     return {
@@ -158,14 +197,14 @@ export default function GestionDesTablesMappingSpatial() {
     const point = positionFromEvent(event);
 
     if (tableId) {
-      updateTable(tableId, { leftPos: String(point.x.toFixed(1)), topPos: String(point.y.toFixed(1)) });
+      updateTable(tableId, { leftPos: String(point.x.toFixed(2)), topPos: String(point.y.toFixed(2)) });
       setDraggedTableId(null);
     }
     if (elementId) {
       const element = planElements.find(item => item.id === elementId);
       if (element) updateElement(elementId, {
-        x: clamp(point.x - element.w / 2, 0, 100 - element.w),
-        y: clamp(point.y - element.h / 2, 0, 100 - element.h)
+        x: Number(clamp(point.x - element.w / 2, 0, 100 - element.w).toFixed(2)),
+        y: Number(clamp(point.y - element.h / 2, 0, 100 - element.h).toFixed(2))
       });
     }
   };
@@ -236,7 +275,7 @@ export default function GestionDesTablesMappingSpatial() {
       const placeholder = orderedEmpty[index];
       if (placeholder) {
         await updateTable(oldTable.id, {
-          name: placeholder.name,
+          name: oldTable.name,
           chairs: Number(placeholder.chairs) || Number(oldTable.chairs) || 0,
           sizeClass: placeholder.sizeClass || oldTable.sizeClass,
           leftPos: placeholder.leftPos,
@@ -363,6 +402,10 @@ export default function GestionDesTablesMappingSpatial() {
                 <div className="space-y-3">
                   <input value={selectedTable.name} onChange={event => updateSelectedTable({ name: event.target.value })} className="w-full border border-outline-variant rounded-md bg-surface px-3 py-2" />
                   <input type="number" min="0" value={selectedTable.chairs} onChange={event => updateSelectedTable({ chairs: Number(event.target.value) || 0 })} className="w-full border border-outline-variant rounded-md bg-surface px-3 py-2" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="text-xs text-secondary">X<input type="number" min="0" max="100" step="0.1" value={parsePercent(selectedTable.leftPos, 50)} onChange={event => updateSelectedTable({ leftPos: String(clamp(Number(event.target.value) || 0, 0, 100).toFixed(2)) })} className="mt-1 w-full border border-outline-variant rounded-md bg-surface px-2 py-2 text-on-surface" /></label>
+                    <label className="text-xs text-secondary">Y<input type="number" min="0" max="100" step="0.1" value={parsePercent(selectedTable.topPos, 50)} onChange={event => updateSelectedTable({ topPos: String(clamp(Number(event.target.value) || 0, 0, 100).toFixed(2)) })} className="mt-1 w-full border border-outline-variant rounded-md bg-surface px-2 py-2 text-on-surface" /></label>
+                  </div>
                   <select value={parseShape(selectedTable.sizeClass)} onChange={event => updateSelectedTable({ sizeClass: makeSizeClass(event.target.value, parseSize(selectedTable.sizeClass)) })} className="w-full border border-outline-variant rounded-md bg-surface px-3 py-2">
                     <option value="round">Ronde</option>
                     <option value="rect">Rectangle</option>
@@ -377,6 +420,10 @@ export default function GestionDesTablesMappingSpatial() {
               ) : selectedElement ? (
                 <div className="space-y-3">
                   <input value={selectedElement.label} onChange={event => updateElement(selectedElement.id, { label: event.target.value })} className="w-full border border-outline-variant rounded-md bg-surface px-3 py-2" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="text-xs text-secondary">X<input type="number" min="0" max="100" step="0.1" value={Number(selectedElement.x).toFixed(1)} onChange={event => updateElement(selectedElement.id, { x: clamp(Number(event.target.value) || 0, 0, 100 - selectedElement.w) })} className="mt-1 w-full border border-outline-variant rounded-md bg-surface px-2 py-2 text-on-surface" /></label>
+                    <label className="text-xs text-secondary">Y<input type="number" min="0" max="100" step="0.1" value={Number(selectedElement.y).toFixed(1)} onChange={event => updateElement(selectedElement.id, { y: clamp(Number(event.target.value) || 0, 0, 100 - selectedElement.h) })} className="mt-1 w-full border border-outline-variant rounded-md bg-surface px-2 py-2 text-on-surface" /></label>
+                  </div>
                   <div className="grid grid-cols-2 gap-2">
                     <label className="text-xs text-secondary">Largeur<input type="number" value={Math.round(selectedElement.w)} onChange={event => updateElement(selectedElement.id, { w: clamp(Number(event.target.value) || 1, 1, 80) })} className="mt-1 w-full border border-outline-variant rounded-md bg-surface px-2 py-2 text-on-surface" /></label>
                     <label className="text-xs text-secondary">Hauteur<input type="number" value={Math.round(selectedElement.h)} onChange={event => updateElement(selectedElement.id, { h: clamp(Number(event.target.value) || 1, 1, 80) })} className="mt-1 w-full border border-outline-variant rounded-md bg-surface px-2 py-2 text-on-surface" /></label>
