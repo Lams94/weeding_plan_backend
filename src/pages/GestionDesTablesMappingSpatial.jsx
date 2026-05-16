@@ -55,7 +55,12 @@ export default function GestionDesTablesMappingSpatial() {
   const selectedElement = planElements.find(element => element.id === selectedElementId);
   const unseatedGuests = guests.filter(guest => !guest.tableId && guest.status !== 'Declined');
   const seatedCount = guests.filter(guest => guest.tableId).length;
-  const capacity = tables.reduce((sum, table) => sum + (Number(table.chairs) || 0), 0);
+  const seatingTables = tables.filter(table => parseShape(table.sizeClass) !== 'bar' && Number(table.chairs) > 0);
+  const capacity = seatingTables.reduce((sum, table) => sum + (Number(table.chairs) || 0), 0);
+  const emptySeatingTables = seatingTables.filter(table => !guests.some(guest => guest.tableId === table.id));
+  const assignedTableIds = new Set(guests.map(guest => guest.tableId).filter(Boolean));
+  const missingAssignedTableCount = [...assignedTableIds].filter(tableId => !tables.some(table => table.id === tableId)).length;
+  const capacityGap = capacity - guests.length;
 
   const tableGuests = useMemo(() => {
     return tables.reduce((acc, table) => {
@@ -134,7 +139,7 @@ export default function GestionDesTablesMappingSpatial() {
     const next = tables.length + 1;
     addTable({
       name: shape === 'bar' ? 'Table buffet' : `Table ${next}`,
-      chairs: shape === 'bar' ? 0 : 8,
+      chairs: shape === 'bar' ? 0 : shape === 'rect' ? 10 : 9,
       topPos: 50,
       leftPos: 50,
       sizeClass: makeSizeClass(shape, shape === 'bar' ? 180 : 104)
@@ -202,6 +207,22 @@ export default function GestionDesTablesMappingSpatial() {
     setActiveTool('select');
   };
 
+  const clearAllGuestPlacements = async () => {
+    if (!window.confirm('Retirer tous les invités des tables ? Tu pourras ensuite les replacer sur le nouveau plan.')) return;
+    for (const guest of guests.filter(item => item.tableId)) {
+      await assignGuestToTable(guest.id, null);
+    }
+  };
+
+  const deleteEmptyTables = async () => {
+    if (!emptySeatingTables.length) return;
+    if (!window.confirm(`Supprimer ${emptySeatingTables.length} table(s) vide(s) ?`)) return;
+    for (const table of emptySeatingTables) {
+      await deleteTable(table.id);
+    }
+    if (selectedTableId && emptySeatingTables.some(table => table.id === selectedTableId)) setSelectedTableId(null);
+  };
+
   return (
     <>
       <TopAppBar title="Editeur plan de salle" role="PLANNER" />
@@ -219,7 +240,7 @@ export default function GestionDesTablesMappingSpatial() {
             </div>
             <div className="bg-surface border border-outline-variant rounded-lg p-3">
               <p className="text-xs uppercase tracking-widest text-secondary">Capacite</p>
-              <p className="font-semibold text-on-surface">{capacity}</p>
+              <p className={`font-semibold ${capacityGap > 30 ? 'text-error' : 'text-on-surface'}`}>{capacity}</p>
             </div>
             <div className="bg-surface border border-outline-variant rounded-lg p-3">
               <p className="text-xs uppercase tracking-widest text-secondary">Calques</p>
@@ -272,6 +293,24 @@ export default function GestionDesTablesMappingSpatial() {
                 <button onClick={() => createTable('bar')} className="rounded-md border border-outline-variant px-4 py-3 text-left hover:border-primary">
                   <span className="material-symbols-outlined align-middle mr-2 text-[18px]">table_bar</span>
                   Table buffet
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-6 border-t border-outline-variant pt-4">
+              <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-3">Controle capacite</p>
+              <div className="rounded-lg bg-surface-container-low border border-outline-variant p-3 text-sm space-y-2">
+                <div className="flex justify-between gap-3"><span>Tables assises</span><strong>{seatingTables.length}</strong></div>
+                <div className="flex justify-between gap-3"><span>Tables vides</span><strong>{emptySeatingTables.length}</strong></div>
+                <div className="flex justify-between gap-3"><span>Surplus places</span><strong className={capacityGap > 30 ? 'text-error' : 'text-on-surface'}>{capacityGap > 0 ? `+${capacityGap}` : capacityGap}</strong></div>
+                {missingAssignedTableCount > 0 && <p className="text-xs text-error">{missingAssignedTableCount} placement(s) pointent vers une table absente.</p>}
+              </div>
+              <div className="grid grid-cols-1 gap-2 mt-3">
+                <button onClick={clearAllGuestPlacements} className="rounded-md border border-outline-variant px-3 py-2 text-sm text-left hover:border-primary">
+                  Replacer tous les invites
+                </button>
+                <button onClick={deleteEmptyTables} className="rounded-md border border-outline-variant px-3 py-2 text-sm text-left hover:border-error disabled:opacity-40" disabled={!emptySeatingTables.length}>
+                  Supprimer tables vides
                 </button>
               </div>
             </div>
@@ -430,6 +469,28 @@ export default function GestionDesTablesMappingSpatial() {
                 </div>
               </div>
             )}
+
+            <div className="mt-5 border-t border-outline-variant pt-4">
+              <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-3">Tables comptees</p>
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                {seatingTables.map(table => (
+                  <button
+                    key={table.id}
+                    onClick={() => {
+                      setSelectedTableId(table.id);
+                      setSelectedElementId(null);
+                    }}
+                    className={`w-full flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-left ${selectedTableId === table.id ? 'border-primary bg-primary/10' : 'border-outline-variant bg-surface-container-low'}`}
+                  >
+                    <span className="min-w-0">
+                      <span className="block text-sm text-on-surface truncate">{table.name}</span>
+                      <span className="block text-xs text-secondary">{tableGuests[table.id]?.length || 0} invite(s)</span>
+                    </span>
+                    <strong className="text-sm">{table.chairs}</strong>
+                  </button>
+                ))}
+              </div>
+            </div>
           </aside>
         </div>
       </main>
