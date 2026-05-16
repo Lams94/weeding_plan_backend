@@ -323,6 +323,9 @@ const useStore = create((set, get) => ({
     socket.off('messageCreated');
     socket.off('vendorPaymentCreated');
     socket.off('vendorPaymentDeleted');
+    socket.off('tableCreated');
+    socket.off('tableUpdated');
+    socket.off('tableDeleted');
 
     socket.on('guestCreated', (newGuest) => {
       set(state => {
@@ -380,6 +383,26 @@ const useStore = create((set, get) => ({
     socket.on('vendorPaymentDeleted', ({ vendor }) => {
       set(state => ({
         vendors: state.vendors.map(v => v.id === vendor.id ? vendor : v)
+      }));
+    });
+
+    socket.on('tableCreated', (newTable) => {
+      set(state => {
+        if (state.tables.some(t => t.id === newTable.id)) return state;
+        return { tables: [...state.tables, newTable] };
+      });
+    });
+
+    socket.on('tableUpdated', (updatedTable) => {
+      set(state => ({
+        tables: state.tables.map(t => t.id === updatedTable.id ? updatedTable : t)
+      }));
+    });
+
+    socket.on('tableDeleted', ({ id }) => {
+      set(state => ({
+        tables: state.tables.filter(t => t.id !== id),
+        guests: state.guests.map(g => g.tableId === id ? { ...g, tableId: null } : g)
       }));
     });
   },
@@ -659,6 +682,68 @@ const useStore = create((set, get) => ({
   toggleTableSelection: (id) => set(state => ({
     tables: state.tables.map(t => t.id === id ? { ...t, selected: !t.selected } : t)
   })),
+
+  addTable: async (tableData = {}) => {
+    if (!get().activeWedding) return;
+    const payload = {
+      name: tableData.name || `Table ${get().tables.length + 1}`,
+      topPos: String(tableData.topPos ?? 50),
+      leftPos: String(tableData.leftPos ?? 50),
+      sizeClass: tableData.sizeClass || 'round:96',
+      chairs: Number(tableData.chairs) || 8
+    };
+    try {
+      const res = await apiFetch('/api/tables', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-wedding-id': get().activeWedding.id },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('Table API unavailable');
+      const newTable = await res.json();
+      const nextTables = [...get().tables, newTable];
+      set({ tables: nextTables });
+      writeLocalProject(get().activeWedding.id, { ...readLocalProject(get().activeWedding.id), tables: nextTables });
+      get().showToast('Table ajoutee');
+    } catch (e) {
+      const localTable = { id: makeId('local-table'), ...payload, weddingId: get().activeWedding.id };
+      const nextTables = [...get().tables, localTable];
+      set({ tables: nextTables });
+      writeLocalProject(get().activeWedding.id, { ...readLocalProject(get().activeWedding.id), tables: nextTables });
+      get().showToast('Table ajoutee sur ce telephone');
+    }
+  },
+
+  updateTable: async (id, data) => {
+    if (!get().activeWedding) return;
+    const nextTables = get().tables.map(t => t.id === id ? { ...t, ...data } : t);
+    set({ tables: nextTables });
+    writeLocalProject(get().activeWedding.id, { ...readLocalProject(get().activeWedding.id), tables: nextTables });
+    try {
+      await apiFetch(`/api/tables/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-wedding-id': get().activeWedding.id },
+        body: JSON.stringify(data)
+      });
+    } catch (e) {
+      get().sendReport('WARN', `Table update local only: ${e.message}`);
+    }
+  },
+
+  deleteTable: async (id) => {
+    if (!get().activeWedding) return;
+    const nextTables = get().tables.filter(t => t.id !== id);
+    const nextGuests = get().guests.map(g => g.tableId === id ? { ...g, tableId: null } : g);
+    set({ tables: nextTables, guests: nextGuests });
+    writeLocalProject(get().activeWedding.id, { ...readLocalProject(get().activeWedding.id), tables: nextTables, guests: nextGuests });
+    try {
+      await apiFetch(`/api/tables/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-wedding-id': get().activeWedding.id }
+      });
+    } catch (e) {
+      get().sendReport('WARN', `Table delete local only: ${e.message}`);
+    }
+  },
 
   updateVendorStatus: async (id, status) => {
     if (!get().activeWedding) return;

@@ -315,6 +315,57 @@ app.get('/api/tables', async (req, res) => {
   res.json(tables);
 });
 
+app.post('/api/tables', async (req, res) => {
+  try {
+    const table = await prisma.table.create({
+      data: {
+        name: req.body.name || 'Nouvelle table',
+        topPos: String(req.body.topPos ?? '50'),
+        leftPos: String(req.body.leftPos ?? '50'),
+        sizeClass: req.body.sizeClass || 'round:96',
+        chairs: Number(req.body.chairs) || 8,
+        weddingId: req.weddingId
+      }
+    });
+    io.emit('tableCreated', table);
+    res.json(table);
+  } catch (error) {
+    console.error('Error creating table:', error);
+    res.status(500).json({ error: 'Failed to create table' });
+  }
+});
+
+app.put('/api/tables/:id', async (req, res) => {
+  try {
+    const allowed = ['name', 'topPos', 'leftPos', 'sizeClass', 'chairs'];
+    const data = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowed.includes(key)));
+    if (data.topPos != null) data.topPos = String(data.topPos);
+    if (data.leftPos != null) data.leftPos = String(data.leftPos);
+    if (data.chairs != null) data.chairs = Number(data.chairs) || 0;
+    const table = await prisma.table.update({
+      where: { id: req.params.id },
+      data
+    });
+    io.emit('tableUpdated', table);
+    res.json(table);
+  } catch (error) {
+    console.error('Error updating table:', error);
+    res.status(500).json({ error: 'Failed to update table' });
+  }
+});
+
+app.delete('/api/tables/:id', async (req, res) => {
+  try {
+    await prisma.guest.updateMany({ where: { tableId: req.params.id }, data: { tableId: null } });
+    await prisma.table.delete({ where: { id: req.params.id } });
+    io.emit('tableDeleted', { id: req.params.id });
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('Error deleting table:', error);
+    res.status(500).json({ error: 'Failed to delete table' });
+  }
+});
+
 // --- AGENDA ---
 app.get('/api/agenda', async (req, res) => {
   const items = await prisma.agendaItem.findMany({ 
