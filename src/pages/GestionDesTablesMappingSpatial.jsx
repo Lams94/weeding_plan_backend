@@ -58,6 +58,7 @@ export default function GestionDesTablesMappingSpatial() {
   const seatingTables = tables.filter(table => parseShape(table.sizeClass) !== 'bar' && Number(table.chairs) > 0);
   const capacity = seatingTables.reduce((sum, table) => sum + (Number(table.chairs) || 0), 0);
   const emptySeatingTables = seatingTables.filter(table => !guests.some(guest => guest.tableId === table.id));
+  const occupiedSeatingTables = seatingTables.filter(table => guests.some(guest => guest.tableId === table.id));
   const assignedTableIds = new Set(guests.map(guest => guest.tableId).filter(Boolean));
   const missingAssignedTableCount = [...assignedTableIds].filter(tableId => !tables.some(table => table.id === tableId)).length;
   const capacityGap = capacity - guests.length;
@@ -223,6 +224,43 @@ export default function GestionDesTablesMappingSpatial() {
     if (selectedTableId && emptySeatingTables.some(table => table.id === selectedTableId)) setSelectedTableId(null);
   };
 
+  const migrateOccupiedTablesToEmptyPositions = async () => {
+    if (!occupiedSeatingTables.length || !emptySeatingTables.length) return;
+    if (!window.confirm(`Remplacer ${Math.min(occupiedSeatingTables.length, emptySeatingTables.length)} table(s) vide(s) par les anciennes tables qui contiennent deja les invites ?`)) return;
+
+    const orderedOccupied = [...occupiedSeatingTables].sort((a, b) => (tableGuests[b.id]?.length || 0) - (tableGuests[a.id]?.length || 0));
+    const orderedEmpty = [...emptySeatingTables].sort((a, b) => parsePercent(a.topPos, 50) - parsePercent(b.topPos, 50) || parsePercent(a.leftPos, 50) - parsePercent(b.leftPos, 50));
+
+    for (let index = 0; index < orderedOccupied.length; index += 1) {
+      const oldTable = orderedOccupied[index];
+      const placeholder = orderedEmpty[index];
+      if (placeholder) {
+        await updateTable(oldTable.id, {
+          name: placeholder.name,
+          chairs: Number(placeholder.chairs) || Number(oldTable.chairs) || 0,
+          sizeClass: placeholder.sizeClass || oldTable.sizeClass,
+          leftPos: placeholder.leftPos,
+          topPos: placeholder.topPos
+        });
+      } else {
+        const gridIndex = index - orderedEmpty.length;
+        const columns = 5;
+        const row = Math.floor(gridIndex / columns);
+        const col = gridIndex % columns;
+        await updateTable(oldTable.id, {
+          leftPos: String(18 + col * 16),
+          topPos: String(18 + row * 14)
+        });
+      }
+    }
+
+    for (const placeholder of orderedEmpty) {
+      await deleteTable(placeholder.id);
+    }
+    setSelectedTableId(orderedOccupied[0]?.id || null);
+    setSelectedElementId(null);
+  };
+
   return (
     <>
       <TopAppBar title="Editeur plan de salle" role="PLANNER" />
@@ -301,11 +339,15 @@ export default function GestionDesTablesMappingSpatial() {
               <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-3">Controle capacite</p>
               <div className="rounded-lg bg-surface-container-low border border-outline-variant p-3 text-sm space-y-2">
                 <div className="flex justify-between gap-3"><span>Tables assises</span><strong>{seatingTables.length}</strong></div>
+                <div className="flex justify-between gap-3"><span>Tables avec invites</span><strong>{occupiedSeatingTables.length}</strong></div>
                 <div className="flex justify-between gap-3"><span>Tables vides</span><strong>{emptySeatingTables.length}</strong></div>
                 <div className="flex justify-between gap-3"><span>Surplus places</span><strong className={capacityGap > 30 ? 'text-error' : 'text-on-surface'}>{capacityGap > 0 ? `+${capacityGap}` : capacityGap}</strong></div>
                 {missingAssignedTableCount > 0 && <p className="text-xs text-error">{missingAssignedTableCount} placement(s) pointent vers une table absente.</p>}
               </div>
               <div className="grid grid-cols-1 gap-2 mt-3">
+                <button onClick={migrateOccupiedTablesToEmptyPositions} className="rounded-md border border-primary px-3 py-2 text-sm text-left text-primary hover:bg-primary/10 disabled:opacity-40" disabled={!occupiedSeatingTables.length || !emptySeatingTables.length}>
+                  Remplacer vides par anciennes
+                </button>
                 <button onClick={clearAllGuestPlacements} className="rounded-md border border-outline-variant px-3 py-2 text-sm text-left hover:border-primary">
                   Replacer tous les invites
                 </button>
