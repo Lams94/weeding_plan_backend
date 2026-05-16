@@ -54,6 +54,7 @@ export default function BudgetSuivi() {
   const [baseBudget, setBaseBudget] = useState(activeWedding?.baseBudget || 0);
   const [paymentForms, setPaymentForms] = useState({});
   const [documentModalVendor, setDocumentModalVendor] = useState(null);
+  const [paymentModalVendor, setPaymentModalVendor] = useState(null);
   const [vendorFilter, setVendorFilter] = useState('all');
   const [documentForm, setDocumentForm] = useState({
     title: '',
@@ -121,6 +122,7 @@ export default function BudgetSuivi() {
       dueDate: form.dueDate || null
     });
     setPaymentForms(prev => ({ ...prev, [vendorId]: { label: 'Acompte', amount: '', kind: 'acompte', status: 'paid', dueDate: '' } }));
+    setPaymentModalVendor(null);
   };
 
   const submitDocument = async (event) => {
@@ -353,7 +355,6 @@ export default function BudgetSuivi() {
           <section className="space-y-5">
             {filteredVendors.map(vendor => {
               const vendorPaidRate = vendor.budget > 0 ? Math.min(100, Math.round((vendor.paid / vendor.budget) * 100)) : 0;
-              const form = paymentForms[vendor.id] || { label: 'Acompte', amount: '', kind: 'acompte' };
               const vendorDocuments = budgetDocuments.filter(document => document.vendorId === vendor.id);
               const health = vendorHealth(vendor);
               return (
@@ -386,21 +387,19 @@ export default function BudgetSuivi() {
                         <span className="text-sm font-semibold text-primary w-12 text-right">{vendorPaidRate}%</span>
                       </div>
 
-                      <form onSubmit={(event) => submitPayment(event, vendor.id)} className="grid grid-cols-1 sm:grid-cols-6 gap-2">
-                        <input value={form.label} onChange={event => updatePaymentForm(vendor.id, { label: event.target.value })} className="border border-outline-variant rounded-md px-3 py-2 bg-surface sm:col-span-1" placeholder="Libellé" />
-                        <select value={form.kind} onChange={event => updatePaymentForm(vendor.id, { kind: event.target.value })} className="border border-outline-variant rounded-md px-3 py-2 bg-surface">
-                          <option value="acompte">Acompte</option>
-                          <option value="facture">Facture</option>
-                          <option value="solde">Solde</option>
-                        </select>
-                        <input type="number" min="0" step="0.01" value={form.amount} onChange={event => updatePaymentForm(vendor.id, { amount: event.target.value })} className="border border-outline-variant rounded-md px-3 py-2 bg-surface" placeholder="Montant" />
-                        <select value={form.status || 'paid'} onChange={event => updatePaymentForm(vendor.id, { status: event.target.value })} className="border border-outline-variant rounded-md px-3 py-2 bg-surface">
-                          <option value="paid">Payé</option>
-                          <option value="due">À payer</option>
-                        </select>
-                        <input type="date" value={form.dueDate || ''} onChange={event => updatePaymentForm(vendor.id, { dueDate: event.target.value })} className="border border-outline-variant rounded-md px-3 py-2 bg-surface" />
-                        <button className="bg-primary text-on-primary rounded-md px-3 py-2 font-label-sm uppercase tracking-widest">Ajouter</button>
-                      </form>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPaymentModalVendor(vendor);
+                          setPaymentForms(prev => ({
+                            ...prev,
+                            [vendor.id]: { label: 'Acompte', amount: '', kind: 'acompte', status: 'paid', dueDate: '' }
+                          }));
+                        }}
+                        className="w-full bg-primary text-on-primary rounded-full px-5 py-3 font-label-sm uppercase tracking-widest hover:bg-primary/90 transition-colors"
+                      >
+                        Ajouter une opération
+                      </button>
                     </div>
                   </div>
 
@@ -515,6 +514,91 @@ export default function BudgetSuivi() {
         {activeTab === 'requests' && renderDocumentList(documentsByTab.requests)}
         {activeTab === 'declined' && renderDocumentList(documentsByTab.declined)}
       </main>
+
+      {paymentModalVendor && (
+        <div className="fixed inset-0 z-[180] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <section className="bg-surface border border-outline-variant rounded-xl shadow-2xl w-full max-w-xl p-6">
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div>
+                <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-2">Paiement prestataire</p>
+                <h2 className="font-headline-md text-headline-md text-on-surface">Ajouter une opération</h2>
+                <p className="text-sm text-on-surface-variant mt-1">{paymentModalVendor.name} - {paymentModalVendor.role}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPaymentModalVendor(null)}
+                className="text-on-surface-variant hover:text-primary"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={event => submitPayment(event, paymentModalVendor.id)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="block md:col-span-2">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Libellé</span>
+                <input
+                  value={(paymentForms[paymentModalVendor.id]?.label) || ''}
+                  onChange={event => updatePaymentForm(paymentModalVendor.id, { label: event.target.value })}
+                  className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface"
+                  placeholder="Ex: Acompte traiteur"
+                />
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Type</span>
+                <select
+                  value={(paymentForms[paymentModalVendor.id]?.kind) || 'acompte'}
+                  onChange={event => updatePaymentForm(paymentModalVendor.id, { kind: event.target.value })}
+                  className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface"
+                >
+                  <option value="acompte">Acompte</option>
+                  <option value="facture">Facture</option>
+                  <option value="solde">Solde</option>
+                </select>
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Statut</span>
+                <select
+                  value={(paymentForms[paymentModalVendor.id]?.status) || 'paid'}
+                  onChange={event => updatePaymentForm(paymentModalVendor.id, { status: event.target.value })}
+                  className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface"
+                >
+                  <option value="paid">Payé</option>
+                  <option value="due">À payer</option>
+                </select>
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Montant</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={(paymentForms[paymentModalVendor.id]?.amount) || ''}
+                  onChange={event => updatePaymentForm(paymentModalVendor.id, { amount: event.target.value })}
+                  className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface"
+                  placeholder="Ex: 3000"
+                />
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-secondary mb-1">Date</span>
+                <input
+                  type="date"
+                  value={(paymentForms[paymentModalVendor.id]?.dueDate) || ''}
+                  onChange={event => updatePaymentForm(paymentModalVendor.id, { dueDate: event.target.value })}
+                  className="w-full border border-outline-variant rounded-md px-3 py-3 bg-surface"
+                />
+              </label>
+              <div className="md:col-span-2 flex flex-col sm:flex-row justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setPaymentModalVendor(null)} className="border border-outline-variant rounded-full px-5 py-3 text-on-surface-variant">
+                  Annuler
+                </button>
+                <button className="bg-primary text-on-primary rounded-full px-6 py-3 font-label-sm uppercase tracking-widest">
+                  Enregistrer
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
 
       {documentModalVendor && (
         <div className="fixed inset-0 z-[180] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
