@@ -614,16 +614,16 @@ export default function BudgetSuivi() {
           </div>
           <div className="print-chart">
             {budgetChartRows.map(row => {
-              const budgetWidth = Math.max(2, Math.round((row.budget / maxChartValue) * 100));
-              const paidWidth = row.budget > 0 ? Math.min(100, Math.round((row.paid / row.budget) * 100)) : 0;
+              const budgetWidth = Math.max(8, Math.round((row.budget / maxChartValue) * 220));
+              const paidWidth = row.budget > 0 ? Math.round((row.paid / row.budget) * budgetWidth) : 0;
               return (
                 <div key={row.role} className="print-chart-row">
                   <span>{row.role}</span>
-                  <div className="print-chart-track">
-                    <div className="print-chart-budget" style={{ width: `${budgetWidth}%` }}>
-                      <div className="print-chart-paid" style={{ width: `${paidWidth}%` }} />
-                    </div>
-                  </div>
+                  <svg className="print-chart-svg" viewBox="0 0 224 14" role="img" aria-label={`Budget ${row.role}`}>
+                    <rect x="0" y="1" width="222" height="12" fill="#ffffff" stroke="#775a19" strokeWidth="1" />
+                    <rect x="1" y="2" width={budgetWidth} height="10" fill="#d9cba9" stroke="#775a19" strokeWidth="0.6" />
+                    <rect x="1" y="4" width={paidWidth} height="6" fill="#775a19" stroke="#261900" strokeWidth="0.4" />
+                  </svg>
                   <strong>{euro.format(row.budget)}</strong>
                 </div>
               );
