@@ -102,6 +102,13 @@ export default function BudgetSuivi() {
       variance: quoteAmount == null ? null : quoteAmount - (Number(vendor.budget) || 0)
     };
   };
+  const reportGeneratedAt = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+  const allMissingDocuments = filteredVendors.flatMap(vendor => {
+    const health = vendorHealth(vendor);
+    return health.missingDocuments.map(type => ({ vendorName: vendor.name, vendorRole: vendor.role, type }));
+  });
+  const paidPayments = filteredVendors.flatMap(vendor => (vendor.payments || []).filter(payment => payment.status === 'paid').map(payment => ({ ...payment, vendorName: vendor.name, vendorRole: vendor.role })));
+  const duePayments = filteredVendors.flatMap(vendor => (vendor.payments || []).filter(payment => payment.status !== 'paid').map(payment => ({ ...payment, vendorName: vendor.name, vendorRole: vendor.role })));
 
   const updatePaymentForm = (vendorId, patch) => {
     setPaymentForms(prev => ({
@@ -218,6 +225,10 @@ export default function BudgetSuivi() {
     URL.revokeObjectURL(url);
   };
 
+  const printBudgetReport = () => {
+    window.print();
+  };
+
   return (
     <>
       <TopAppBar title="Budget & Documents" role="FINANCE" />
@@ -280,7 +291,7 @@ export default function BudgetSuivi() {
             <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary mb-3">Exports</p>
             <div className="flex gap-2">
               <button onClick={exportBudgetCsv} className="flex-1 border border-outline-variant rounded-md px-3 py-3 text-sm text-on-surface hover:border-primary">Excel CSV</button>
-              <button onClick={() => window.print()} className="flex-1 border border-outline-variant rounded-md px-3 py-3 text-sm text-on-surface hover:border-primary">PDF / Imprimer</button>
+              <button onClick={printBudgetReport} className="flex-1 border border-outline-variant rounded-md px-3 py-3 text-sm text-on-surface hover:border-primary">PDF / Imprimer</button>
             </div>
           </div>
           <div className="bg-surface border border-outline-variant rounded-xl p-5">
@@ -514,6 +525,180 @@ export default function BudgetSuivi() {
         {activeTab === 'requests' && renderDocumentList(documentsByTab.requests)}
         {activeTab === 'declined' && renderDocumentList(documentsByTab.declined)}
       </main>
+
+      <section className="budget-print-report">
+        <header className="print-report-header">
+          <div>
+            <p className="print-kicker">Rapport financier mariage</p>
+            <h1>{activeWedding?.name || 'Projet mariage'}</h1>
+            <p>Genere le {reportGeneratedAt}</p>
+          </div>
+          <div className="print-report-badge">
+            <span>{paidRate}%</span>
+            <small>paiements realises</small>
+          </div>
+        </header>
+
+        <section className="print-summary-grid">
+          <div>
+            <span>Budget de base</span>
+            <strong>{euro.format(base)}</strong>
+          </div>
+          <div>
+            <span>Engage prestataires</span>
+            <strong>{euro.format(committed)}</strong>
+          </div>
+          <div>
+            <span>Paye</span>
+            <strong>{euro.format(paid)}</strong>
+          </div>
+          <div>
+            <span>Reste budget</span>
+            <strong>{euro.format(remaining)}</strong>
+          </div>
+        </section>
+
+        <section className="print-section">
+          <div className="print-section-title">
+            <h2>Synthese prestataires</h2>
+            <p>{filteredVendors.length} prestataire(s) dans ce rapport</p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Prestataire</th>
+                <th>Role</th>
+                <th>Contrat</th>
+                <th>Devis</th>
+                <th>Paye</th>
+                <th>Reste</th>
+                <th>Docs manquants</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredVendors.map(vendor => {
+                const health = vendorHealth(vendor);
+                return (
+                  <tr key={vendor.id}>
+                    <td>{vendor.name}</td>
+                    <td>{vendor.role}</td>
+                    <td>{contractLabel(vendor.contractStatus)}</td>
+                    <td>{euro.format(vendor.budget || 0)}</td>
+                    <td>{euro.format(vendor.paid || 0)}</td>
+                    <td>{euro.format((vendor.budget || 0) - (vendor.paid || 0))}</td>
+                    <td>{health.missingDocuments.length ? health.missingDocuments.map(typeLabel).join(', ') : 'OK'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </section>
+
+        <section className="print-two-columns">
+          <div className="print-section">
+            <div className="print-section-title">
+              <h2>Paiements enregistres</h2>
+              <p>{paidPayments.length} operation(s) payee(s)</p>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Prestataire</th>
+                  <th>Operation</th>
+                  <th>Date</th>
+                  <th>Montant</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paidPayments.length ? paidPayments.map(payment => (
+                  <tr key={payment.id}>
+                    <td>{payment.vendorName}</td>
+                    <td>{payment.label} ({payment.kind})</td>
+                    <td>{new Date(payment.dueDate || payment.paidAt).toLocaleDateString('fr-FR')}</td>
+                    <td>{euro.format(payment.amount)}</td>
+                  </tr>
+                )) : (
+                  <tr><td colSpan="4">Aucun paiement enregistre.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="print-section">
+            <div className="print-section-title">
+              <h2>Echeances a suivre</h2>
+              <p>{duePayments.length} paiement(s) a payer</p>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Prestataire</th>
+                  <th>Operation</th>
+                  <th>Echeance</th>
+                  <th>Montant</th>
+                </tr>
+              </thead>
+              <tbody>
+                {duePayments.length ? duePayments.map(payment => (
+                  <tr key={payment.id}>
+                    <td>{payment.vendorName}</td>
+                    <td>{payment.label} ({payment.kind})</td>
+                    <td>{payment.dueDate ? new Date(payment.dueDate).toLocaleDateString('fr-FR') : 'Non definie'}</td>
+                    <td>{euro.format(payment.amount)}</td>
+                  </tr>
+                )) : (
+                  <tr><td colSpan="4">Aucune echeance ouverte.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="print-section">
+          <div className="print-section-title">
+            <h2>Documents et conformite</h2>
+            <p>{budgetDocuments.length} document(s) classe(s) - {allMissingDocuments.length} manque(s)</p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Prestataire</th>
+                <th>Document</th>
+                <th>Type</th>
+                <th>Statut</th>
+                <th>Montant</th>
+              </tr>
+            </thead>
+            <tbody>
+              {budgetDocuments.length ? budgetDocuments.map(document => (
+                <tr key={document.id}>
+                  <td>{document.vendor?.name || vendors.find(v => v.id === document.vendorId)?.name || 'Sans prestataire'}</td>
+                  <td>{document.title}</td>
+                  <td>{typeLabel(document.type)}</td>
+                  <td>{document.status === 'declined' ? `Decline${document.declinedReason ? ` - ${document.declinedReason}` : ''}` : document.isVerified ? 'Verifie' : 'A verifier'}</td>
+                  <td>{document.amount != null ? euro.format(document.amount) : '-'}</td>
+                </tr>
+              )) : (
+                <tr><td colSpan="5">Aucun document financier classe.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </section>
+
+        {allMissingDocuments.length > 0 && (
+          <section className="print-section print-alert-section">
+            <div className="print-section-title">
+              <h2>Actions prioritaires</h2>
+              <p>Documents a recuperer</p>
+            </div>
+            <ul>
+              {allMissingDocuments.map(item => (
+                <li key={`${item.vendorName}-${item.type}`}>{item.vendorName} ({item.vendorRole}) : {typeLabel(item.type)}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </section>
 
       {paymentModalVendor && (
         <div className="fixed inset-0 z-[180] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
